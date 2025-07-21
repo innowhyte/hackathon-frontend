@@ -27,7 +27,7 @@ export default function DayLesson() {
   }
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background min-h-screen pb-20">
       <Header title={`Day ${selectedDay} Lesson Plan`} onBack={() => navigate('/plan')} />
 
       <div className="p-6">
