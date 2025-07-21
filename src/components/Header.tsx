@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from './ui/button'
-import { AppContext } from '../context/AppContext'
+import { AppContext } from '../context/app-context'
 
 interface HeaderProps {
   title: string
@@ -9,7 +9,7 @@ interface HeaderProps {
   showAIHelp?: boolean
 }
 
-const Header = ({ title, onBack, showAIHelp = false }: HeaderProps) => {
+export default function Header({ title, onBack, showAIHelp = false }: HeaderProps) {
   const context = useContext(AppContext)
 
   if (!context) {
@@ -20,9 +20,9 @@ const Header = ({ title, onBack, showAIHelp = false }: HeaderProps) => {
 
   return (
     <div className="bg-secondary flex items-center justify-between p-4 shadow-sm backdrop-blur-sm">
-      <button onClick={onBack} className="bg-primary rounded-lg p-2 transition-colors duration-200">
+      <Button onClick={onBack} variant="default" size="icon" className="rounded-lg p-2 transition-colors duration-200">
         <ArrowLeft className="h-6 w-6" />
-      </button>
+      </Button>
       <h1 className="text-xl font-medium text-black">{title}</h1>
       {showAIHelp ? (
         <Button
@@ -47,5 +47,3 @@ const Header = ({ title, onBack, showAIHelp = false }: HeaderProps) => {
     </div>
   )
 }
-
-export default Header

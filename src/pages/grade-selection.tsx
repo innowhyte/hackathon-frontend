@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router'
 import { useContext } from 'react'
-import { AppContext } from '../context/AppContext'
-import { Button } from '@/components/ui/button'
+import { AppContext } from '../context/app-context'
+import { Button } from '../components/ui/button'
 
-const GradeSelection = () => {
+export default function GradeSelection() {
   const context = useContext(AppContext)
   const navigate = useNavigate()
 
@@ -47,19 +47,21 @@ const GradeSelection = () => {
         {/* Grade Selection Cards */}
         <div className="mb-6 space-y-3">
           {grades.map(grade => (
-            <button
+            <Button
               key={grade.id}
               onClick={() => handleGradeSelect(grade.id)}
-              className={`shadow-elevation-1 hover:shadow-elevation-2 w-full rounded-3xl p-4 text-left transition-all duration-300 ${
+              variant={isGradeSelected(grade.id) ? 'default' : 'outline'}
+              size="lg"
+              className={`shadow-elevation-1 hover:shadow-elevation-2 h-auto w-full rounded-3xl p-4 text-left transition-all duration-300 ${
                 isGradeSelected(grade.id)
                   ? 'bg-secondary border-primary border-2 text-black'
                   : 'border-secondary hover:bg-secondary/50 bg-background border-2 text-black'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="text-base font-medium">{grade.name}</span>
+              <div className="relative flex w-full items-center">
+                <span className="flex-1 text-center">{grade.name}</span>
                 {isGradeSelected(grade.id) && (
-                  <div className="bg-primary flex h-6 w-6 items-center justify-center rounded-full">
+                  <div className="bg-primary absolute right-0 flex h-6 w-6 items-center justify-center rounded-full">
                     <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
@@ -70,7 +72,7 @@ const GradeSelection = () => {
                   </div>
                 )}
               </div>
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -83,17 +85,12 @@ const GradeSelection = () => {
           </div>
         )}
 
-        {/* Continue Button */}
-        {selectedGrades.length > 0 && (
-          <div className="mt-8">
-            <Button onClick={handleContinue} size="xl" className="w-full">
-              <span className="text-base font-medium">Continue</span>
-            </Button>
-          </div>
-        )}
+        <div className="mt-8">
+          <Button disabled={selectedGrades.length === 0} onClick={handleContinue} size="xl" className="w-full">
+            <span className="text-base font-medium">Continue</span>
+          </Button>
+        </div>
       </div>
     </div>
   )
 }
-
-export default GradeSelection

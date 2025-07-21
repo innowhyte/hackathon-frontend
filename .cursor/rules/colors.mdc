@@ -1,0 +1,365 @@
+# Design System Rules & Consistency Guidelines
+
+## 🎨 Color System Rules
+
+### Primary Colors
+
+- **Background**: `bg-primary`
+- **Text**: `text-primary-foreground` (NOT `text-white`)
+- **Hover**: `hover:bg-primary/90`
+- **Border**: `border-primary`
+
+**❌ INCORRECT:**
+
+```tsx
+className = 'bg-primary-40 text-white' // Wrong - bg-primary-40 doesn't exist
+className = 'bg-primary text-white' // Wrong - should use text-primary-foreground
+```
+
+**✅ CORRECT:**
+
+```tsx
+className = 'bg-primary text-primary-foreground hover:bg-primary/90'
+```
+
+### Secondary Colors
+
+- **Background**: `bg-secondary`
+- **Text**: `text-secondary-foreground`
+- **Hover**: `hover:bg-secondary/80`
+
+### Accent Colors
+
+- **Background**: `bg-accent`
+- **Text**: `text-accent-foreground`
+- **Hover**: `hover:bg-accent`
+
+### Destructive Colors
+
+- **Background**: `bg-destructive`
+- **Text**: `text-white` (exception - destructive uses white text)
+- **Hover**: `hover:bg-destructive/90`
+
+### Text Colors
+
+- **Default text**: `text-foreground`
+- **Muted text**: `text-muted-foreground`
+- **Placeholder text**: `placeholder:text-muted-foreground`
+
+### Background Colors
+
+- **Main background**: `bg-background`
+- **Card background**: `bg-card`
+- **Muted background**: `bg-muted`
+
+## 🔧 Component Patterns
+
+### Button Components
+
+**ALWAYS use shadcn Button component with proper variants:**
+
+**✅ CORRECT:**
+
+```tsx
+import { Button } from '../components/ui/button'
+
+// Primary button
+<Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+  Click me
+</Button>
+
+// Secondary button
+<Button variant="secondary">
+  Secondary
+</Button>
+
+// Outline button
+<Button variant="outline">
+  Outline
+</Button>
+
+// Destructive button
+<Button variant="destructive">
+  Delete
+</Button>
+```
+
+**❌ INCORRECT:**
+
+```tsx
+// Don't use native button with custom classes
+<button className="bg-primary-40 text-white">Click me</button>
+```
+
+### Dropdown Components
+
+**ALWAYS use shadcn DropdownMenu:**
+
+**✅ CORRECT:**
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../components/ui/dropdown-menu'
+import { Button } from '../components/ui/button'
+import { ChevronDownIcon } from 'lucide-react'
+
+;<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="outline" className="w-full justify-between">
+      <span className={selected ? 'text-foreground' : 'text-muted-foreground'}>{selected || 'Select option'}</span>
+      <ChevronDownIcon className="h-4 w-4" />
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    {options.map(option => (
+      <DropdownMenuItem key={option.id} onClick={() => setSelected(option)}>
+        {option.name}
+      </DropdownMenuItem>
+    ))}
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+### Input Components
+
+**ALWAYS use shadcn Input component:**
+
+**✅ CORRECT:**
+
+```tsx
+import { Input } from '../components/ui/input'
+
+;<Input
+  value={value}
+  onChange={e => setValue(e.target.value)}
+  placeholder="Enter text"
+  className="border-border focus:border-primary"
+/>
+```
+
+### Dialog Components
+
+**ALWAYS use shadcn Dialog components:**
+
+**✅ CORRECT:**
+
+```tsx
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog'
+
+;<Dialog open={open} onOpenChange={setOpen}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Title</DialogTitle>
+    </DialogHeader>
+    {/* Content */}
+  </DialogContent>
+</Dialog>
+```
+
+## 📱 Layout & Spacing Rules
+
+### Container Patterns
+
+- **Main container**: `max-w-2xl mx-auto`
+- **Padding**: `p-6` for main content areas
+- **Margin bottom**: `mb-6` for sections, `mb-4` for smaller elements
+
+### Rounded Corners
+
+- **Large elements**: `rounded-2xl` (cards, main containers)
+- **Medium elements**: `rounded-xl` (buttons, sections)
+- **Small elements**: `rounded-lg` (small buttons, inputs)
+
+### Shadows
+
+- **Cards**: `shadow-md`
+- **Buttons**: `shadow-xs` (built into shadcn Button)
+- **Elevation**: Use `shadow-elevation-*` classes for modals
+
+## 🎯 State Management Rules
+
+### Button States
+
+- **Disabled**: `disabled:cursor-not-allowed disabled:opacity-50`
+- **Loading**: Show spinner or disable button
+- **Always visible**: Buttons should remain visible but disabled based on state
+
+### Form Validation
+
+- **Required fields**: Disable submit button until all required fields are filled
+- **Visual feedback**: Use proper focus states and validation colors
+
+## 🔄 Animation & Transitions
+
+### Standard Transitions
+
+- **Buttons**: `transition-all duration-300`
+- **Hover effects**: `hover:bg-primary/90` (90% opacity)
+- **Focus states**: `focus:ring-2 focus:ring-primary/20`
+
+### Modal Animations
+
+- **Enter**: `animate-in fade-in-0 zoom-in-95`
+- **Exit**: `animate-out fade-out-0 zoom-out-95`
+
+## 📝 Text & Typography Rules
+
+### Font Weights
+
+- **Headings**: `font-semibold` or `font-medium`
+- **Body text**: `font-normal`
+- **Labels**: `font-medium`
+
+### Text Sizes
+
+- **Main headings**: `text-2xl` or `text-xl`
+- **Section headings**: `text-lg`
+- **Body text**: `text-sm` or `text-base`
+- **Small text**: `text-xs`
+
+### Text Colors
+
+- **Headings**: `text-neutral-800` or `text-foreground`
+- **Body text**: `text-neutral-700` or `text-foreground`
+- **Muted text**: `text-muted-foreground`
+- **Placeholders**: `placeholder:text-muted-foreground`
+
+## 🚫 Common Mistakes to Avoid
+
+### 1. Made-up Color Classes
+
+**❌ DON'T USE:**
+
+- `bg-primary-40`, `bg-primary-50`, `bg-primary-90`
+- `text-neutral-10`, `text-neutral-30`
+- `bg-secondary-40`, `bg-secondary-90`
+
+### 2. Inconsistent Text Colors
+
+**❌ DON'T USE:**
+
+```tsx
+className = 'bg-primary text-white' // Wrong
+```
+
+**✅ USE:**
+
+```tsx
+className = 'bg-primary text-primary-foreground' // Correct
+```
+
+### 3. Native HTML Elements
+
+**❌ DON'T USE:**
+
+```tsx
+<button className="bg-primary text-white">Click</button>
+<select className="...">...</select>
+<input className="..." />
+```
+
+**✅ USE:**
+
+```tsx
+<Button className="bg-primary text-primary-foreground">Click</Button>
+<DropdownMenu>...</DropdownMenu>
+<Input className="..." />
+```
+
+### 4. Inconsistent Spacing
+
+**❌ DON'T USE:**
+
+```tsx
+<div className="p-4 mb-3">  // Inconsistent spacing
+```
+
+**✅ USE:**
+
+```tsx
+<div className="p-6 mb-6">  // Consistent with design system
+```
+
+## 🎨 Icon Usage Rules
+
+### Icon Sizes
+
+- **Small icons**: `h-4 w-4` (16px)
+- **Medium icons**: `h-5 w-5` (20px)
+- **Large icons**: `h-6 w-6` (24px)
+
+### Icon Colors
+
+- **Default**: Inherit text color
+- **Muted**: `text-muted-foreground`
+- **Primary**: `text-primary`
+
+### Icon Spacing
+
+- **With text**: `mr-2` or `ml-2`
+- **Button icons**: Use gap-2 (built into Button component)
+
+## 📱 Responsive Design Rules
+
+### Breakpoints
+
+- **Mobile-first**: Design for mobile, enhance for larger screens
+- **Consistent spacing**: Use same padding/margins across screen sizes
+- **Touch targets**: Minimum 44px height for interactive elements
+
+### Layout Patterns
+
+- **Single column**: Mobile and tablet
+- **Two column**: Desktop when appropriate
+- **Max width**: `max-w-2xl` for content containers
+
+## 🔍 Code Quality Rules
+
+### Import Organization
+
+1. React imports
+2. Third-party libraries
+3. Internal components (UI components first)
+4. Utilities and hooks
+
+### Component Structure
+
+1. Imports
+2. Component definition
+3. Context/hooks
+4. Event handlers
+5. JSX return
+
+### Naming Conventions
+
+- **Components**: PascalCase (`AddStudentDialog`)
+- **Files**: PascalCase for components, camelCase for utilities
+- **Variables**: camelCase
+- **Constants**: UPPER_SNAKE_CASE
+
+## 🧪 Testing & Validation Rules
+
+### Visual Testing
+
+- Test all button states (default, hover, disabled, loading)
+- Test form validation states
+- Test responsive behavior
+- Test accessibility (keyboard navigation, screen readers)
+
+### Code Validation
+
+- No unused imports
+- No console.log statements
+- Proper TypeScript types
+- Consistent formatting (Prettier)
+
+---
+
+**Remember**: Consistency is key. Always refer to this guide when making changes to maintain a cohesive design system across the entire application.
+alwaysApply: true
+
+---

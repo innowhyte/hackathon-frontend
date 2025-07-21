@@ -1,16 +1,16 @@
 import React, { useContext } from 'react'
 import { useNavigate } from 'react-router'
-import { AppContext } from '../context/AppContext'
-import BottomNav from '../components/BottomNav'
+import { AppContext } from '../context/app-context'
+import BottomNav from '../components/bottom-nav'
 import { Sparkles } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
 import { Textarea } from '../components/ui/textarea'
-import Header from '../components/Header'
-import AIHelpDialog from '../components/modals/AIHelpDialog'
+import Header from '../components/header'
+import AIHelpDialog from '../components/modals/ai-help-dialog'
 
-const TopicSetup = () => {
+export default function TopicSetup() {
   const context = useContext(AppContext)
   const navigate = useNavigate()
 
@@ -33,7 +33,6 @@ const TopicSetup = () => {
     setUploadedFile,
     supportingMaterials,
     setSupportingMaterials,
-    setShowAIHelpDialog,
   } = context
 
   const handleContinue = () => {
@@ -279,5 +278,3 @@ const TopicSetup = () => {
     </div>
   )
 }
-
-export default TopicSetup

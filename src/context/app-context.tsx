@@ -51,6 +51,8 @@ interface AppContextState {
   setStoryPrompt: React.Dispatch<React.SetStateAction<string>>
   showFlashcardDialog: boolean
   setShowFlashcardDialog: React.Dispatch<React.SetStateAction<boolean>>
+  flashcardPrompt: string
+  setFlashcardPrompt: React.Dispatch<React.SetStateAction<string>>
   currentCardIndex: number
   setCurrentCardIndex: React.Dispatch<React.SetStateAction<number>>
   showDescription: boolean
@@ -85,8 +87,7 @@ interface AppContextState {
   setCardResponses: React.Dispatch<React.SetStateAction<string[]>>
   students: { [key: number]: { id: number; name: string }[] }
   setStudents: React.Dispatch<React.SetStateAction<{ [key: number]: { id: number; name: string }[] }>>
-  newStudentName: string
-  setNewStudentName: React.Dispatch<React.SetStateAction<string>>
+
   selectedGradeForStudents: number | null
   setSelectedGradeForStudents: React.Dispatch<React.SetStateAction<number | null>>
   showAddStudentModal: boolean
@@ -185,6 +186,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [showStoryDialog, setShowStoryDialog] = useState(false)
   const [storyPrompt, setStoryPrompt] = useState('')
   const [showFlashcardDialog, setShowFlashcardDialog] = useState(false)
+  const [flashcardPrompt, setFlashcardPrompt] = useState('')
   const [currentCardIndex, setCurrentCardIndex] = useState(0)
   const [showDescription, setShowDescription] = useState(false)
   const [showGamifiedDialog, setShowGamifiedDialog] = useState(false)
@@ -202,7 +204,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [cardPrompts, setCardPrompts] = useState(['', '', ''])
   const [cardResponses, setCardResponses] = useState(['', '', ''])
   const [students, setStudents] = useState<{ [key: number]: { id: number; name: string }[] }>({})
-  const [newStudentName, setNewStudentName] = useState('')
+
   const [selectedGradeForStudents, setSelectedGradeForStudents] = useState<number | null>(null)
   const [showAddStudentModal, setShowAddStudentModal] = useState(false)
   const [selectedStudentForReport, setSelectedStudentForReport] = useState<{ id: number; name: string } | null>(null)
@@ -334,6 +336,8 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     setStoryPrompt,
     showFlashcardDialog,
     setShowFlashcardDialog,
+    flashcardPrompt,
+    setFlashcardPrompt,
     currentCardIndex,
     setCurrentCardIndex,
     showDescription,
@@ -368,8 +372,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     setCardResponses,
     students,
     setStudents,
-    newStudentName,
-    setNewStudentName,
     selectedGradeForStudents,
     setSelectedGradeForStudents,
     showAddStudentModal,

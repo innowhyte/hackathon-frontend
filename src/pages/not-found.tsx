@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
-const NotFound = () => {
+export default function NotFound() {
   return (
     <div className="bg-background flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-primary mb-4 text-4xl font-bold">404 - Not Found</h1>
@@ -11,5 +11,3 @@ const NotFound = () => {
     </div>
   )
 }
-
-export default NotFound

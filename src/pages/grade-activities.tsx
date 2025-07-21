@@ -1,10 +1,11 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 import { useContext } from 'react'
-import { AppContext } from '../context/AppContext'
-import Header from '../components/Header'
-import AIHelpDialog from '../components/modals/AIHelpDialog'
+import { AppContext } from '../context/app-context'
+import Header from '../components/header'
+import { Button } from '../components/ui/button'
+import AIHelpDialog from '../components/modals/ai-help-dialog'
 
-const GradeActivities = () => {
+export default function GradeActivities() {
   const context = useContext(AppContext)
   const navigate = useNavigate()
   const { day, gradeId } = useParams()
@@ -73,10 +74,12 @@ const GradeActivities = () => {
                 const selected =
                   gradeActivitiesSelections[day as string]?.[currentGradeId as number]?.mode === option.id
                 return (
-                  <button
+                  <Button
                     key={option.id}
                     onClick={() => handleModeSelect(option.id)}
-                    className={`flex items-center gap-2 rounded-xl border-2 px-5 py-2 text-base font-medium transition-all duration-200 ${selected ? 'bg-primary border-primary text-white' : 'text-neutral-30 border-neutral-80 hover:border-primary hover:text-primary bg-white'}`}
+                    variant={selected ? 'default' : 'outline'}
+                    size="sm"
+                    className={`flex items-center gap-2 rounded-xl border-2 px-5 py-2 text-base font-medium transition-all duration-200 ${selected ? 'bg-primary border-primary text-primary-foreground' : 'text-neutral-30 border-neutral-80 hover:border-primary hover:text-primary bg-white'}`}
                     style={{ minWidth: 'fit-content' }}
                   >
                     {selected && (
@@ -90,7 +93,7 @@ const GradeActivities = () => {
                       </svg>
                     )}
                     {option.label}
-                  </button>
+                  </Button>
                 )
               })}
             </div>
@@ -105,9 +108,11 @@ const GradeActivities = () => {
                   gradeActivitiesSelections[day as string]?.[currentGradeId as number]?.modalities || []
                 ).includes(option.id)
                 return (
-                  <button
+                  <Button
                     key={option.id}
                     onClick={() => handleModalityToggle(option.id)}
+                    variant={selected ? 'secondary' : 'outline'}
+                    size="sm"
                     className={`flex items-center gap-2 rounded-xl border-2 px-5 py-2 text-base font-medium transition-all duration-200 ${selected ? 'bg-secondary-90 text-secondary-40 border-secondary-40' : 'text-neutral-30 border-neutral-80 hover:border-secondary-40 hover:text-secondary-40 bg-white'}`}
                     style={{ minWidth: 'fit-content' }}
                   >
@@ -122,7 +127,7 @@ const GradeActivities = () => {
                       </svg>
                     )}
                     {option.label}
-                  </button>
+                  </Button>
                 )
               })}
             </div>
@@ -130,14 +135,14 @@ const GradeActivities = () => {
           {/* Generate Button (always visible if ready) */}
           {gradeActivitiesSelections[day as string]?.[currentGradeId as number]?.mode &&
             (gradeActivitiesSelections[day as string]?.[currentGradeId as number]?.modalities || []).length > 0 && (
-              <button
+              <Button
                 onClick={() => {
                   navigate(`/day/${day}/grade/${currentGradeId}/carousel`)
                 }}
-                className="bg-primary hover:bg-primary/90 mb-8 w-full rounded-xl px-6 py-3 font-medium text-white shadow-sm transition-all duration-200"
+                className="mb-8 w-full rounded-xl px-6 py-3 font-medium shadow-sm transition-all duration-200"
               >
                 Generate
-              </button>
+              </Button>
             )}
         </div>
       </div>
@@ -145,5 +150,3 @@ const GradeActivities = () => {
     </div>
   )
 }
-
-export default GradeActivities

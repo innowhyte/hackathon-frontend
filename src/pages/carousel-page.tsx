@@ -1,10 +1,11 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 import { useContext, useEffect } from 'react'
-import { AppContext } from '../context/AppContext'
-import Header from '../components/Header'
-import AIHelpDialog from '../components/modals/AIHelpDialog'
+import { AppContext } from '../context/app-context'
+import Header from '../components/header'
+import { Button } from '../components/ui/button'
+import AIHelpDialog from '../components/modals/ai-help-dialog'
 
-const CarouselPage = () => {
+export default function CarouselPage() {
   const context = useContext(AppContext)
   const navigate = useNavigate()
   const { day, gradeId } = useParams()
@@ -14,7 +15,6 @@ const CarouselPage = () => {
   }
 
   const {
-    activeGradeId,
     gradeActivitiesSelections,
     hasGenerated,
     setHasGenerated,
@@ -24,7 +24,6 @@ const CarouselPage = () => {
     setCardPrompts,
     cardResponses,
     setCardResponses,
-    topic,
   } = context
 
   // Generate activity instructions based on selections
@@ -136,12 +135,12 @@ const CarouselPage = () => {
         <div className="text-center">
           <h2 className="mb-2 text-xl font-medium text-neutral-800">No Activities Available</h2>
           <p className="mb-4 text-neutral-600">Please configure grade activities first.</p>
-          <button
+          <Button
             onClick={() => navigate(`/day/${day}/grade/${gradeId}/activities`)}
-            className="bg-primary hover:bg-primary/90 rounded-lg px-6 py-2 text-white transition-colors"
+            className="rounded-lg px-6 py-2 transition-colors"
           >
             Go Back to Activities
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -169,27 +168,31 @@ const CarouselPage = () => {
                 </div>
                 {/* Carousel Navigation */}
                 <div className="flex w-full items-center justify-between px-4">
-                  <button
+                  <Button
                     onClick={handlePrevious}
+                    variant="outline"
+                    size="icon"
                     className="rounded-full bg-neutral-200 p-2 hover:bg-neutral-300"
                     aria-label="Previous"
                   >
                     <svg className="h-5 w-5 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
-                  </button>
+                  </Button>
                   <span className="text-sm text-neutral-500">
                     {carouselIndex + 1} / {activityInstructions.length}
                   </span>
-                  <button
+                  <Button
                     onClick={handleNext}
+                    variant="outline"
+                    size="icon"
                     className="rounded-full bg-neutral-200 p-2 hover:bg-neutral-300"
                     aria-label="Next"
                   >
                     <svg className="h-5 w-5 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                  </button>
+                  </Button>
                 </div>
               </div>
               {/* Prompt input and response */}
@@ -205,13 +208,15 @@ const CarouselPage = () => {
                     className="focus:ring-primary-40 flex-1 rounded-lg border border-neutral-300 p-2 focus:ring-2 focus:outline-none"
                     placeholder="e.g., How can I make this more engaging?"
                   />
-                  <button
+                  <Button
                     onClick={handleAskQuestion}
-                    className="bg-primary-40 text-primary-100 hover:bg-primary-10 rounded-lg px-4 py-2 transition-all"
+                    variant="secondary"
+                    size="sm"
+                    className="rounded-lg px-4 py-2 transition-all"
                     disabled={!cardPrompts[carouselIndex].trim()}
                   >
                     Ask
-                  </button>
+                  </Button>
                 </div>
                 {cardResponses[carouselIndex] && (
                   <div className="bg-primary-90 text-neutral-10 mt-2 rounded-lg p-3 text-sm">
@@ -227,5 +232,3 @@ const CarouselPage = () => {
     </div>
   )
 }
-
-export default CarouselPage

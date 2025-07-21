@@ -1,15 +1,16 @@
 import { useNavigate, useParams } from 'react-router'
 import { useContext } from 'react'
-import { AppContext } from '../context/AppContext'
-import Header from '../components/Header'
-import AIHelpDialog from '../components/modals/AIHelpDialog'
-import BlackboardDialog from '../components/modals/BlackboardDialog'
-import StoryDialog from '../components/modals/StoryDialog'
-import FlashcardDialog from '../components/modals/FlashcardDialog'
-import GamifiedDialog from '../components/modals/GamifiedDialog'
-import QuestionPromptsDialog from '../components/modals/QuestionPromptsDialog'
+import { AppContext } from '../context/app-context'
+import Header from '../components/header'
+import { Button } from '../components/ui/button'
+import AIHelpDialog from '../components/modals/ai-help-dialog'
+import BlackboardDialog from '../components/modals/blackboard-dialog'
+import StoryDialog from '../components/modals/story-dialog'
+import FlashcardDialog from '../components/modals/flashcard-dialog'
+import GamifiedDialog from '../components/modals/gamified-dialog'
+import QuestionPromptsDialog from '../components/modals/question-prompts-dialog'
 
-const WholeClassActivities = () => {
+export default function WholeClassActivities() {
   const { day } = useParams()
   const context = useContext(AppContext)
   const navigate = useNavigate()
@@ -21,7 +22,6 @@ const WholeClassActivities = () => {
   const {
     lessonPlan,
     topic,
-    setShowAIHelpDialog,
     setShowBlackboardDialog,
     setShowStoryDialog,
     setShowFlashcardDialog,
@@ -77,7 +77,7 @@ const WholeClassActivities = () => {
 
   return (
     <div className="bg-background min-h-screen">
-      <Header title="Generate Teaching Materials" onBack={() => navigate(`/day/${day}`)} />
+      <Header title="Generate Teaching Materials" onBack={() => navigate(`/day/${day}`)} showAIHelp={true} />
 
       <div className="p-6">
         <div className="mx-auto max-w-4xl">
@@ -98,39 +98,19 @@ const WholeClassActivities = () => {
           {/* Activity Options */}
           <div className="mb-8">
             <h3 className="mb-6 text-xl font-medium text-neutral-800">Generate any of the following:</h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="flex flex-wrap justify-center gap-4">
               {activityOptions.map(option => (
-                <button
+                <Button
                   key={option.id}
                   onClick={option.onClick}
-                  className="group flex flex-col items-center rounded-2xl border border-neutral-200 bg-white/80 p-6 shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:shadow-xl"
+                  variant="outline"
+                  size="lg"
+                  className="group flex h-auto flex-col items-center rounded-2xl border border-neutral-200 bg-white/80 p-4 break-words shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:shadow-xl sm:p-6"
                 >
-                  <div
-                    className={`mb-4 flex h-16 w-16 items-center justify-center rounded-full ${option.color} text-2xl text-white shadow-lg`}
-                  >
-                    {option.icon}
-                  </div>
-                  <h4 className="group-hover:text-primary mb-2 text-center text-lg font-semibold text-neutral-800">
-                    {option.title}
-                  </h4>
-                  <p className="text-center text-sm text-neutral-600">{option.description}</p>
-                </button>
+                  {option.title}
+                </Button>
               ))}
             </div>
-          </div>
-
-          {/* AI Help Section */}
-          <div className="w-full rounded-2xl border border-neutral-200 bg-white/80 p-6 shadow-lg backdrop-blur-sm">
-            <h3 className="mb-4 text-xl font-medium text-neutral-800">Need Help?</h3>
-            <p className="mb-4 text-sm text-neutral-600">
-              Get AI assistance for creating engaging whole class activities and materials.
-            </p>
-            <button
-              onClick={() => setShowAIHelpDialog(true)}
-              className="bg-primary hover:bg-primary/90 w-full rounded-xl px-4 py-3 font-medium text-white transition-all duration-200"
-            >
-              Get AI Help
-            </button>
           </div>
         </div>
       </div>
@@ -145,5 +125,3 @@ const WholeClassActivities = () => {
     </div>
   )
 }
-
-export default WholeClassActivities

@@ -1,11 +1,13 @@
 import { useParams, useNavigate } from 'react-router'
 import { useContext } from 'react'
-import { AppContext } from '../context/AppContext'
+import { AppContext } from '../context/app-context'
 import { Users } from 'lucide-react'
-import Header from '../components/Header'
-import AIHelpDialog from '../components/modals/AIHelpDialog'
+import Header from '../components/header'
+import { Button } from '../components/ui/button'
+import AIHelpDialog from '../components/modals/ai-help-dialog'
+import BottomNav from '../components/bottom-nav'
 
-const DayLesson = () => {
+export default function DayLesson() {
   const { day } = useParams()
   const context = useContext(AppContext)
   const navigate = useNavigate()
@@ -47,12 +49,12 @@ const DayLesson = () => {
                 </div>
               )}
               <div className="mt-4">
-                <button
+                <Button
                   onClick={() => navigate(`/day/${selectedDay}/activities`)}
-                  className="bg-primary hover:bg-primary/90 w-full rounded-xl px-4 py-3 font-medium text-white transition-all duration-200"
+                  className="w-full rounded-xl px-4 py-3 font-medium transition-all duration-200"
                 >
                   Generate Teaching Materials
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -73,12 +75,12 @@ const DayLesson = () => {
                     <h4 className="text-primary-10 mb-2 text-sm font-medium">Learning Objective:</h4>
                     <p className="text-sm leading-relaxed text-neutral-700">{gradePlan.learning_objective}</p>
                   </div>
-                  <button
+                  <Button
                     onClick={() => handleGradeActivitiesClick(gradeNumber)}
-                    className="bg-primary hover:bg-primary/90 w-full rounded-xl px-4 py-3 font-medium text-white transition-all duration-200"
+                    className="w-full rounded-xl px-4 py-3 font-medium transition-all duration-200"
                   >
                     Create Grade Activities
-                  </button>
+                  </Button>
                 </div>
               )
             })}
@@ -86,8 +88,7 @@ const DayLesson = () => {
         </div>
       </div>
       <AIHelpDialog />
+      <BottomNav />
     </div>
   )
 }
-
-export default DayLesson

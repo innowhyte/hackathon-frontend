@@ -1,0 +1,35 @@
+---
+alwaysApply: false
+---
+# Development Guidelines
+
+## Build/Lint/Test Commands
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production (runs TypeScript check + Vite build)
+- `pnpm lint` - Run ESLint
+- `pnpm lint:fix` - Fix ESLint issues automatically
+- `pnpm format` - Format code with Prettier
+- No test framework configured - verify changes manually
+
+## Code Style Guidelines
+
+### Imports & Structure
+- Use `@/` path alias for src imports: `import { Button } from '@/components/ui/button'`
+- Import order: React → third-party → UI components → utilities/context
+- Use TypeScript with strict typing
+
+### Component Patterns
+- Always use shadcn/ui components (Button, Input, Dialog, DropdownMenu, etc.)
+- Never use native HTML elements like `<button>`, `<select>`, `<input>`
+- Follow existing component structure: imports → hooks → handlers → JSX
+
+### Styling & Colors
+- Use semantic color classes: `bg-primary`, `text-primary-foreground`, `bg-secondary`
+- Never use made-up classes like `bg-primary-40` or `text-neutral-10`
+- Consistent spacing: `p-6`, `mb-6`, `rounded-2xl` for cards
+- Use `transition-all duration-300` for animations
+
+### Naming Conventions
+- Components: PascalCase (`AddStudentDialog`)
+- Files: kebab-case for pages, PascalCase for components
+- Variables: camelCase, Constants: UPPER_SNAKE_CASE

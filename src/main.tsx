@@ -1,19 +1,22 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { AppContextProvider } from './context/AppContext'
-import GradeSelection from './pages/GradeSelection'
-import TopicSetup from './pages/TopicSetup'
-import WeeklyPlan from './pages/WeeklyPlan'
-import DayLesson from './pages/DayLesson'
-import StudentManagement from './pages/StudentManagement'
-import TopicAssessment from './pages/TopicAssessment'
-import ConductAssessment from './pages/ConductAssessment'
-import GradeActivities from './pages/GradeActivities'
-import WholeClassActivities from './pages/WholeClassActivities'
-import CarouselPage from './pages/CarouselPage'
-import NotFound from './pages/NotFound'
+import { createBrowserRouter, RouterProvider } from 'react-router'
+import { AppContextProvider } from './context/app-context'
+import GradeSelection from './pages/grade-selection'
+import TopicSetup from './pages/topic-setup'
+import WeeklyPlan from './pages/weekly-plan'
+import DayLesson from './pages/day-lesson'
+import StudentManagement from './pages/student-management'
+import TopicAssessment from './pages/topic-assessment'
+import ConductAssessment from './pages/conduct-assessment'
+import AssessmentOverview from './pages/assessment-overview'
+import StudentAssessment from './pages/student-assessment'
+import GradeActivities from './pages/grade-activities'
+import WholeClassActivities from './pages/whole-class-activities'
+import CarouselPage from './pages/carousel-page'
+import NotFound from './pages/not-found'
 import './index.css'
+import { Toaster } from '@/components/ui/sonner'
 
 const router = createBrowserRouter([
   {
@@ -42,7 +45,15 @@ const router = createBrowserRouter([
     element: <TopicAssessment />,
   },
   {
-    path: '/assessment/:assessmentId',
+    path: '/assessment/:assessmentId/conduct/grade/:grade',
+    element: <AssessmentOverview />,
+  },
+  {
+    path: '/assessment/:assessmentId/student/:studentId',
+    element: <StudentAssessment />,
+  },
+  {
+    path: '/assessment/:assessmentId/:grade',
     element: <ConductAssessment />,
   },
   {
@@ -63,6 +74,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AppContextProvider>
       <RouterProvider router={router} />
+      <Toaster />
     </AppContextProvider>
   </React.StrictMode>,
 )

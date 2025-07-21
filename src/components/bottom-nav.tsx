@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router'
 
-const BottomNav = () => {
+export default function BottomNav() {
   return (
     <nav className="border-border shadow-elevation-3 bg-background/95 fixed bottom-0 left-0 z-50 w-full border-t-2 backdrop-blur-md">
       <div className="mx-auto flex max-w-2xl items-center justify-around py-2">
@@ -8,7 +8,7 @@ const BottomNav = () => {
           to="/setup"
           className={({ isActive }) =>
             `flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
-              isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
+              isActive ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
             }`
           }
         >
@@ -37,10 +37,23 @@ const BottomNav = () => {
           <span className="text-xs font-medium">Lesson Plan</span>
         </NavLink>
         <NavLink
+          to="/assessment"
+          className={({ isActive }) =>
+            `flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
+              isActive ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
+            }`
+          }
+        >
+          <svg className="mb-1 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          <span className="text-xs font-medium">Assessment</span>
+        </NavLink>
+        <NavLink
           to="/students"
           className={({ isActive }) =>
             `flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
-              isActive ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-muted'
+              isActive ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
             }`
           }
         >
@@ -51,5 +64,3 @@ const BottomNav = () => {
     </nav>
   )
 }
-
-export default BottomNav

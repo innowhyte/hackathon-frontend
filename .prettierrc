@@ -7,7 +7,6 @@
   "tabWidth": 2,
   "useTabs": false,
   "bracketSpacing": true,
-  "jsxBracketSameLine": false,
   "endOfLine": "lf",
   "plugins": ["prettier-plugin-tailwindcss"]
 }

@@ -1,6 +1,7 @@
 import { useContext } from 'react'
-import { AppContext } from '../../context/AppContext'
+import { AppContext } from '../../context/app-context'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { Button } from '../ui/button'
 
 const AIHelpDialog = () => {
   const context = useContext(AppContext)
@@ -79,9 +80,10 @@ const AIHelpDialog = () => {
               />
             </div>
           </div>
-          <button
+          <Button
             onClick={handleAIHelpSubmit}
-            className={`bg-secondary hover:shadow-elevation-3 active:shadow-elevation-1 text-secondary-foreground shadow-elevation-2 hover:bg-accent w-full rounded-3xl px-6 py-4 font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50`}
+            variant="secondary"
+            className="w-full rounded-3xl px-6 py-4 font-medium transition-all duration-300"
             disabled={!aiHelpPrompt.trim()}
           >
             <span className="flex items-center justify-center">
@@ -95,7 +97,7 @@ const AIHelpDialog = () => {
               </svg>
               Submit
             </span>
-          </button>
+          </Button>
           {aiHelpResponse && (
             <div className="bg-muted border-secondary mt-6 rounded-2xl border-l-4 p-4">
               <h4 className="text-foreground mb-3 flex items-center text-lg font-medium">
