@@ -27,11 +27,11 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
   },
   {
-    path: '/setup',
+    path: '/create-topic',
     element: <TopicSetup />,
   },
   {
-    path: '/plan',
+    path: '/weekly-plan',
     element: <WeeklyPlan />,
   },
   {

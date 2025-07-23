@@ -1,5 +1,4 @@
 import { createContext, useState, useRef, type ReactNode } from 'react'
-import { data } from '../lib/data'
 
 interface AppContextState {
   currentScreen: string
@@ -276,7 +275,8 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     { id: 'paper', label: 'Paper/Slate based' },
   ]
 
-  const lessonPlan = topic ? data[topic as keyof typeof data]?.outputs || [] : []
+  // Lesson plan is now fetched from API based on selected topic
+  const lessonPlan: any[] = []
 
   const value = {
     currentScreen,

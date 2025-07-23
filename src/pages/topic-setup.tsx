@@ -70,7 +70,7 @@ export default function TopicSetup() {
   }
 
   const handleContinue = () => {
-    navigate('/plan')
+    navigate('/weekly-plan')
   }
 
   const handleLearningOutcomeChange = (gradeName: string, value: string) => {

@@ -1,0 +1,152 @@
+import { useState, useCallback } from 'react'
+import { fetchEventSource } from '@microsoft/fetch-event-source'
+import type { Classroom } from '@/queries/classroom-queries'
+
+export interface StoryGenerationState {
+  isGenerating: boolean
+  progress: string
+  story: string
+  error: string | null
+}
+
+export interface StoryGenerationOptions {
+  latestClassroom: Classroom
+  topic_id: string
+  topic: string
+  context: string
+  concept_to_introduce: string
+  thread_id: string
+  onProgress?: (progress: string) => void
+  onStoryGenerated?: (story: string) => void
+  onError?: (error: string) => void
+}
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+
+export const useStoryGeneration = () => {
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [progress, setProgress] = useState('')
+  const [story, setStory] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const abortController = new AbortController()
+
+  const generateStory = useCallback(async (options: StoryGenerationOptions) => {
+    if (isGenerating) return
+
+    let isMounted = true
+
+    const {
+      latestClassroom,
+      topic_id,
+      topic,
+      context,
+      concept_to_introduce,
+      thread_id,
+      onProgress,
+      onStoryGenerated,
+      onError,
+    } = options
+
+    // Reset state
+    setIsGenerating(true)
+    setProgress('')
+    setStory('')
+    setError(null)
+
+    await fetchEventSource(`${API_BASE_URL}/api/${topic_id}/generate-story`, {
+      signal: abortController.signal,
+      openWhenHidden: true,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        topic,
+        context,
+        thread_id,
+        classroom_id: String(latestClassroom.id),
+        location: latestClassroom.location,
+        language: latestClassroom.language,
+        concept_to_introduce: concept_to_introduce,
+        grades: latestClassroom.grades.map(grade => grade.name),
+      }),
+      onmessage(event) {
+        const { event: eventType, data } = event
+
+        switch (eventType) {
+          case 'progress':
+            const progressMessage = data
+            setProgress(progressMessage)
+            onProgress?.(progressMessage)
+            break
+
+          case 'data':
+            const storyData = data
+            setStory(storyData)
+            onStoryGenerated?.(storyData)
+            break
+
+          case 'error':
+            const errorMessage = data
+            setError(errorMessage)
+            onError?.(errorMessage)
+            break
+
+          default:
+            // Handle any other event types
+            console.log('Unknown event type:', eventType, data)
+        }
+      },
+      onclose() {
+        if (!isMounted) return
+        // Connection closed
+        setIsGenerating(false)
+      },
+      onerror(err) {
+        // Network or other errors
+        let errorMessage = err.message || 'Failed to generate story'
+
+        setError(errorMessage)
+        onError?.(errorMessage)
+
+        // Abort the connection to prevent infinite retries
+        abortController.abort()
+      },
+      // Handle HTTP errors
+      // eslint-disable-next-line @typescript-eslint/require-await
+      async onopen(response) {
+        if (!isMounted) return
+        if (response.ok) {
+          console.log('Story generation stream opened successfully')
+        } else {
+          console.error('Story generation stream failed with status:', response.status)
+          setError(`Failed to start story generation: HTTP ${response.status}`)
+          setIsGenerating(false)
+          abortController.abort()
+          throw new Error(`HTTP ${response.status}`)
+        }
+      },
+    })
+  }, [])
+
+  const cancelGeneration = useCallback(() => {
+    abortController.abort()
+  }, [])
+
+  const reset = useCallback(() => {
+    setIsGenerating(false)
+    setProgress('')
+    setStory('')
+    setError(null)
+  }, [])
+
+  return {
+    isGenerating,
+    progress,
+    story,
+    error,
+    generateStory,
+    cancelGeneration,
+    reset,
+  }
+}

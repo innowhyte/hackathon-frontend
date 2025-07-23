@@ -5,7 +5,7 @@ export default function BottomNav() {
     <nav className="border-border shadow-elevation-3 bg-background/95 fixed bottom-0 left-0 z-50 w-full border-t-2 backdrop-blur-md">
       <div className="mx-auto flex max-w-2xl items-center justify-around py-2">
         <NavLink
-          to="/setup"
+          to="/create-topic"
           className={({ isActive }) =>
             `flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
               isActive ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
@@ -23,7 +23,7 @@ export default function BottomNav() {
           <span className="text-xs font-medium">Topic</span>
         </NavLink>
         <NavLink
-          to="/plan"
+          to="/weekly-plan"
           className={({ isActive }) =>
             `flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
               isActive ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'

@@ -14,6 +14,7 @@ import {
 } from '../components/ui/dropdown-menu'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
 import { useLatestClassroom } from '../queries/classroom-queries'
+import Loading from '@/components/loading'
 
 export default function TopicAssessment() {
   useTitle('Topic Assessment')
@@ -22,7 +23,7 @@ export default function TopicAssessment() {
   const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
 
   if (!context || isLoadingClassroom) {
-    return <div>Loading...</div>
+    return <Loading message="Loading classroom..." />
   }
 
   const {
@@ -107,7 +108,7 @@ export default function TopicAssessment() {
 
   return (
     <div className="bg-background min-h-screen pb-20">
-      <Header title="Topic Assessment" onBack={() => navigate('/plan')} />
+      <Header title="Topic Assessment" onBack={() => navigate('/weekly-plan')} />
 
       <div className="p-4">
         <div className="mx-auto max-w-md space-y-6">

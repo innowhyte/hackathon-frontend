@@ -4,7 +4,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { Loader2 } from 'lucide-react'
 
-const BlackboardDialog = () => {
+const BlackboardDialog = ({
+  showBlackboardDialog,
+  setShowBlackboardDialog,
+}: {
+  showBlackboardDialog: boolean
+  setShowBlackboardDialog: (open: boolean) => void
+}) => {
   const context = useContext(AppContext)
   const [isLoading, setIsLoading] = useState(false)
   const [generatedImage, setGeneratedImage] = useState<string>('black_board_drawing.jpg')
@@ -13,7 +19,7 @@ const BlackboardDialog = () => {
     return null
   }
 
-  const { showBlackboardDialog, setShowBlackboardDialog, blackboardPrompt, setBlackboardPrompt } = context
+  const { blackboardPrompt, setBlackboardPrompt } = context
 
   const handleBlackboardSubmit = () => {
     if (blackboardPrompt.trim()) {
@@ -39,19 +45,21 @@ const BlackboardDialog = () => {
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            <svg className="text-secondary mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-              />
-            </svg>
-            Blackboard Drawing Generator
+          <DialogTitle className="text-start">
+            <div className="flex items-center justify-start">
+              <svg className="text-secondary mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                />
+              </svg>
+              Generate Blackboard Drawing
+            </div>
           </DialogTitle>
         </DialogHeader>
-        <div className="p-6">
+        <div className="p-0">
           <div className="mb-6 space-y-4">
             {isLoading ? (
               <div className="flex items-center justify-center">

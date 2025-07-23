@@ -3,20 +3,20 @@ import { AppContext } from '../../context/app-context'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
 
-const QuestionPromptsDialog = () => {
+const QuestionPromptsDialog = ({
+  showQuestionPromptsDialog,
+  setShowQuestionPromptsDialog,
+}: {
+  showQuestionPromptsDialog: boolean
+  setShowQuestionPromptsDialog: (open: boolean) => void
+}) => {
   const context = useContext(AppContext)
 
   if (!context) {
     return null
   }
 
-  const {
-    showQuestionPromptsDialog,
-    setShowQuestionPromptsDialog,
-    questionPromptsPrompt,
-    setQuestionPromptsPrompt,
-    topic,
-  } = context
+  const { questionPromptsPrompt, setQuestionPromptsPrompt, topic } = context
 
   const handleQuestionPromptsSubmit = () => {
     if (questionPromptsPrompt.trim()) {
@@ -37,19 +37,21 @@ const QuestionPromptsDialog = () => {
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            <svg className="text-secondary mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Question Prompts Generator
+          <DialogTitle className="text-start">
+            <div className="flex items-center justify-start">
+              <svg className="text-secondary mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Generate Questions
+            </div>
           </DialogTitle>
         </DialogHeader>
-        <div className="p-6 pt-0">
+        <div className="p-0">
           <div className="mb-6">
             <div className="bg-muted mb-4 rounded-xl p-4">
               <h4 className="text-foreground mb-3 flex items-center text-lg font-medium">
@@ -61,14 +63,14 @@ const QuestionPromptsDialog = () => {
                     d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                Sample Question Prompts:
+                Sample Questions:
               </h4>
               <div className="text-foreground space-y-2 text-sm">
-                <p>• "What do you already know about {topic}?"</p>
-                <p>• "How do you think {topic} affects our daily lives?"</p>
-                <p>• "What questions do you have about {topic}?"</p>
-                <p>• "Can you think of examples of {topic} in your community?"</p>
-                <p>• "What would happen if we didn't have {topic}?"</p>
+                <li>What do you already know about {topic}?</li>
+                <li>How do you think {topic} affects our daily lives?</li>
+                <li>What questions do you have about {topic}?</li>
+                <li>Can you think of examples of {topic} in your community?</li>
+                <li>What would happen if we didn't have {topic}?</li>
               </div>
             </div>
             <label className="text-muted-foreground mb-3 block text-sm font-medium">

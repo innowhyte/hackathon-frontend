@@ -1,19 +1,23 @@
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { useTitle } from '../hooks/use-title'
 import { useContext } from 'react'
 import { AppContext } from '../context/app-context'
 import Header from '../components/header'
 import { Button } from '../components/ui/button'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
+import Loading from '@/components/loading'
 
 export default function GradeActivities() {
   const { day, gradeId } = useParams()
+  const [searchParams] = useSearchParams()
+  const topicIdParam = searchParams.get('topicId')
+  const topicId = topicIdParam ? parseInt(topicIdParam) : null
   useTitle(`Day ${day} | Grade ${gradeId} Activities`)
   const context = useContext(AppContext)
   const navigate = useNavigate()
 
   if (!context) {
-    return <div>Loading...</div>
+    return <Loading message="Loading classroom..." />
   }
 
   const {
@@ -64,7 +68,13 @@ export default function GradeActivities() {
     <div className="bg-background min-h-screen">
       <Header
         title={isWholeClass ? 'Whole Class Activities' : `Grade ${currentGradeId} Activities`}
-        onBack={() => navigate(`/day/${day}`)}
+        onBack={() => {
+          if (topicId) {
+            navigate(`/day/${day}?topicId=${topicId}`)
+          } else {
+            navigate(`/day/${day}`)
+          }
+        }}
       />
       <div className="mb-4 flex items-center justify-center p-6">
         <div className="w-full max-w-2xl">
@@ -139,7 +149,11 @@ export default function GradeActivities() {
             (gradeActivitiesSelections[day as string]?.[currentGradeId as number]?.modalities || []).length > 0 && (
               <Button
                 onClick={() => {
-                  navigate(`/day/${day}/grade/${currentGradeId}/carousel`)
+                  if (topicId) {
+                    navigate(`/day/${day}/grade/${currentGradeId}/carousel?topicId=${topicId}`)
+                  } else {
+                    navigate(`/day/${day}/grade/${currentGradeId}/carousel`)
+                  }
                 }}
                 className="mb-8 w-full rounded-xl px-6 py-3 font-medium shadow-sm transition-all duration-200"
               >

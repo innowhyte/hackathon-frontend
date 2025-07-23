@@ -15,13 +15,13 @@ interface StudentCardProps {
   isRemoving?: boolean
 }
 
-export default function StudentCard({ 
-  student, 
-  feedbackCount, 
-  onOpenFeedback, 
-  onOpenEdit, 
-  onRemove, 
-  isRemoving = false 
+export default function StudentCard({
+  student,
+  feedbackCount,
+  onOpenFeedback,
+  onOpenEdit,
+  onRemove,
+  isRemoving = false,
 }: StudentCardProps) {
   return (
     <div className="hover:bg-muted/50 flex items-center justify-between p-4 transition-colors">
@@ -68,4 +68,4 @@ export default function StudentCard({
       </div>
     </div>
   )
-} 
+}

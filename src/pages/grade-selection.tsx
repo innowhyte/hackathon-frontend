@@ -94,7 +94,7 @@ export default function GradeSelection() {
     if (allValid) {
       createOrUpdateClassroom(getPayload(), {
         onSuccess: () => {
-          navigate('/setup')
+          navigate('/create-topic')
         },
       })
     }

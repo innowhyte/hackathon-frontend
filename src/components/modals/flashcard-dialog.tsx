@@ -3,7 +3,13 @@ import { AppContext } from '../../context/app-context'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
 
-const FlashcardDialog = () => {
+const FlashcardDialog = ({
+  showFlashcardDialog,
+  setShowFlashcardDialog,
+}: {
+  showFlashcardDialog: boolean
+  setShowFlashcardDialog: (open: boolean) => void
+}) => {
   const context = useContext(AppContext)
   const [isFlipped, setIsFlipped] = useState(false)
   const [currentCardIndex, setCurrentCardIndex] = useState(0)
@@ -12,7 +18,7 @@ const FlashcardDialog = () => {
     return null
   }
 
-  const { showFlashcardDialog, setShowFlashcardDialog, flashcardPrompt, setFlashcardPrompt } = context
+  const { flashcardPrompt, setFlashcardPrompt } = context
 
   const handleFlashcardSubmit = () => {
     if (flashcardPrompt.trim()) {
@@ -176,28 +182,30 @@ const FlashcardDialog = () => {
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader className="flex-shrink-0 pb-3 sm:pb-4">
-          <DialogTitle className="text-lg sm:text-xl">
-            <svg
-              className="text-secondary mr-2 h-5 w-5 sm:mr-3 sm:h-6 sm:w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            Interactive Flashcards
+          <DialogTitle className="text-start">
+            <div className="flex items-center justify-start">
+              <svg
+                className="text-secondary mr-2 h-5 w-5 sm:mr-3 sm:h-6 sm:w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              Generate Flashcards
+            </div>
           </DialogTitle>
         </DialogHeader>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4 sm:px-6 sm:pb-6">
+        <div className="p-0">
           {/* Flashcard Display */}
-          <div className="mt-4 mb-6 flex justify-center sm:mt-6 sm:mb-8">
+          <div className="mb-6 flex justify-center">
             <div className="perspective-1000 relative h-56 w-72 cursor-pointer sm:h-64 sm:w-80" onClick={handleFlip}>
               <div
                 className={`transform-style-preserve-3d absolute h-full w-full transition-transform duration-500 ${

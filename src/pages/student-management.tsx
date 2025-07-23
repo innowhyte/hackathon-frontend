@@ -48,7 +48,7 @@ export default function StudentManagement() {
   if (isLoadingClassroom) {
     return (
       <div className="bg-background min-h-screen pb-20">
-        <Header title="Student Management" onBack={() => navigate('/plan')} />
+        <Header title="Student Management" onBack={() => navigate('/weekly-plan')} />
         <div className="p-6">
           <div className="mx-auto max-w-2xl">
             <div className="py-12 text-center">
@@ -66,7 +66,7 @@ export default function StudentManagement() {
 
   return (
     <div className="bg-background min-h-screen pb-20">
-      <Header title="Student Management" onBack={() => navigate('/plan')} />
+      <Header title="Student Management" onBack={() => navigate('/weekly-plan')} />
 
       <div className="p-6">
         <div className="mx-auto max-w-2xl">

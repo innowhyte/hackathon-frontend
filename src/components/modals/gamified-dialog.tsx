@@ -3,14 +3,20 @@ import { AppContext } from '../../context/app-context'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
 
-const GamifiedDialog = () => {
+const GamifiedDialog = ({
+  showGamifiedDialog,
+  setShowGamifiedDialog,
+}: {
+  showGamifiedDialog: boolean
+  setShowGamifiedDialog: (open: boolean) => void
+}) => {
   const context = useContext(AppContext)
 
   if (!context) {
     return null
   }
 
-  const { showGamifiedDialog, setShowGamifiedDialog, gamifiedPrompt, setGamifiedPrompt, topic } = context
+  const { gamifiedPrompt, setGamifiedPrompt, topic } = context
 
   const handleGamifiedSubmit = () => {
     if (gamifiedPrompt.trim()) {
@@ -31,19 +37,21 @@ const GamifiedDialog = () => {
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            <svg className="text-secondary mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Gamified Activities Generator
+          <DialogTitle className="text-start">
+            <div className="flex items-center justify-start">
+              <svg className="text-secondary mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Gamified Activities
+            </div>
           </DialogTitle>
         </DialogHeader>
-        <div className="p-6 pt-0">
+        <div className="p-0">
           <div className="mb-6">
             <div className="bg-muted mb-4 rounded-xl p-4">
               <h4 className="text-foreground mb-3 flex items-center text-lg font-medium">

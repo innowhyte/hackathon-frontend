@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 export interface LearningOutcomeInput {
   learning_outcomes: string
@@ -37,7 +37,11 @@ const createTopic = async (data: CreateTopicInput): Promise<Topic> => {
 }
 
 export const useCreateTopic = () => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: createTopic,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['topics'] })
+    },
   })
 }
