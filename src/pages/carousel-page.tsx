@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from 'react-router'
+import { useTitle } from '../hooks/use-title'
 import { useContext, useEffect } from 'react'
 import { AppContext } from '../context/app-context'
 import Header from '../components/header'
@@ -6,6 +7,7 @@ import { Button } from '../components/ui/button'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
 
 export default function CarouselPage() {
+  useTitle('Carousel')
   const context = useContext(AppContext)
   const navigate = useNavigate()
   const { day, gradeId } = useParams()

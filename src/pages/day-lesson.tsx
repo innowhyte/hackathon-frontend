@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router'
+import { useTitle } from '../hooks/use-title'
 import { useContext } from 'react'
 import { AppContext } from '../context/app-context'
 import { Users } from 'lucide-react'
@@ -11,12 +12,13 @@ export default function DayLesson() {
   const { day } = useParams()
   const context = useContext(AppContext)
   const navigate = useNavigate()
-
+  
   if (!context) {
     return <div>Loading...</div>
   }
-
+  
   const { lessonPlan, topic, setActiveGradeId } = context
+  useTitle(`Day ${day} | ${topic}`)
   const selectedDay = parseInt(day || '1')
 
   const currentDayPlan = lessonPlan.find((d: any) => d.day === selectedDay)

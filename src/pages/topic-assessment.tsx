@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router'
+import { useTitle } from '../hooks/use-title'
 import { useContext } from 'react'
 import { AppContext } from '../context/app-context'
 import BottomNav from '../components/bottom-nav'
@@ -12,18 +13,20 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
+import { useLatestClassroom } from '../queries/classroom-queries'
 
 export default function TopicAssessment() {
+  useTitle('Topic Assessment')
   const context = useContext(AppContext)
   const navigate = useNavigate()
+  const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
 
-  if (!context) {
+  if (!context || isLoadingClassroom) {
     return <div>Loading...</div>
   }
 
   const {
     topic,
-    selectedGrades,
     selectedGradeForAssessment,
     setSelectedGradeForAssessment,
     selectedAssessmentType,
@@ -37,6 +40,21 @@ export default function TopicAssessment() {
     assessmentOptions,
     setAssessmentOptions,
   } = context
+
+  // Map grades from latestClassroom to expected format
+  const gradesList = [
+    { id: 1, name: 'Grade 1' },
+    { id: 2, name: 'Grade 2' },
+    { id: 3, name: 'Grade 3' },
+    { id: 4, name: 'Grade 4' },
+    { id: 5, name: 'Grade 5' },
+  ]
+  const selectedGrades = (latestClassroom?.grades || [])
+    .map(g => {
+      const gradeObj = gradesList.find(gr => gr.name === g.name)
+      return gradeObj ? { gradeId: gradeObj.id, specialInstructions: g.special_instructions || '' } : undefined
+    })
+    .filter((g): g is { gradeId: number; specialInstructions: string } => g !== undefined)
 
   const handleGenerateAssessment = () => {
     if (selectedGradeForAssessment && selectedAssessmentType) {
@@ -103,16 +121,20 @@ export default function TopicAssessment() {
           <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
             <h2 className="mb-3 text-base font-medium text-neutral-800">Select Grade for Assessment</h2>
             <div className="flex gap-2">
-              {selectedGrades.map(grade => (
-                <Button
-                  key={grade}
-                  onClick={() => setSelectedGradeForAssessment(grade)}
-                  variant={selectedGradeForAssessment === grade ? 'default' : 'outline'}
-                  className="flex-1 py-2 text-sm"
-                >
-                  Grade {grade}
-                </Button>
-              ))}
+              {selectedGrades.length > 0 ? (
+                selectedGrades.map(g => (
+                  <Button
+                    key={g.gradeId}
+                    onClick={() => setSelectedGradeForAssessment(g.gradeId)}
+                    variant={selectedGradeForAssessment === g.gradeId ? 'default' : 'outline'}
+                    className="flex-1 py-2 text-sm"
+                  >
+                    Grade {g.gradeId}
+                  </Button>
+                ))
+              ) : (
+                <span className="text-sm text-neutral-500">No grades found. Please set up grades first.</span>
+              )}
             </div>
           </div>
 

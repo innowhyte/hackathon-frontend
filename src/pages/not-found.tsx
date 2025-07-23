@@ -1,6 +1,8 @@
 import { Link } from 'react-router'
+import { useTitle } from '../hooks/use-title'
 
 export default function NotFound() {
+  useTitle('404 - Not Found')
   return (
     <div className="bg-background flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-primary mb-4 text-4xl font-bold">404 - Not Found</h1>

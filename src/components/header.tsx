@@ -19,7 +19,7 @@ export default function Header({ title, onBack, showAIHelp = false }: HeaderProp
   const { setShowAIHelpDialog } = context
 
   return (
-    <div className="bg-secondary flex items-center justify-between p-4 shadow-sm backdrop-blur-sm">
+    <div className="bg-secondary flex items-center justify-between px-4 py-2 shadow-sm backdrop-blur-sm">
       <Button onClick={onBack} variant="default" size="icon" className="rounded-lg p-2 transition-colors duration-200">
         <ArrowLeft className="h-6 w-6" />
       </Button>

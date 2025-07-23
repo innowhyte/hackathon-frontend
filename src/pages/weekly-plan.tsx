@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router'
+import { useTitle } from '../hooks/use-title'
 import { useContext } from 'react'
 import { AppContext } from '../context/app-context'
 import BottomNav from '../components/bottom-nav'
@@ -7,6 +8,7 @@ import { Button } from '../components/ui/button'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
 
 export default function WeeklyPlan() {
+  useTitle('Weekly Plan')
   const context = useContext(AppContext)
   const navigate = useNavigate()
 

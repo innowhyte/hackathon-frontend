@@ -1,18 +1,15 @@
 import { createContext, useState, useRef, type ReactNode } from 'react'
 import { data } from '../lib/data'
 
-// Define the shape of the context state
 interface AppContextState {
-  selectedGrades: number[]
-  setSelectedGrades: React.Dispatch<React.SetStateAction<number[]>>
   currentScreen: string
   setCurrentScreen: React.Dispatch<React.SetStateAction<string>>
   selectedAnswer: string | null
   setSelectedAnswer: React.Dispatch<React.SetStateAction<string | null>>
   topic: string
   setTopic: React.Dispatch<React.SetStateAction<string>>
-  learningOutcomes: { [key: number]: string }
-  setLearningOutcomes: React.Dispatch<React.SetStateAction<{ [key: number]: string }>>
+  learningOutcomes: { [key: string]: string }
+  setLearningOutcomes: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>
   uploadedFile: File | null
   setUploadedFile: React.Dispatch<React.SetStateAction<File | null>>
   linkUrl: string
@@ -85,13 +82,8 @@ interface AppContextState {
   setCardPrompts: React.Dispatch<React.SetStateAction<string[]>>
   cardResponses: string[]
   setCardResponses: React.Dispatch<React.SetStateAction<string[]>>
-  students: { [key: number]: { id: number; name: string }[] }
-  setStudents: React.Dispatch<React.SetStateAction<{ [key: number]: { id: number; name: string }[] }>>
+  // Students are now managed by React Query, keeping only the selected grade for UI state
 
-  selectedGradeForStudents: number | null
-  setSelectedGradeForStudents: React.Dispatch<React.SetStateAction<number | null>>
-  showAddStudentModal: boolean
-  setShowAddStudentModal: React.Dispatch<React.SetStateAction<boolean>>
   selectedStudentForReport: { id: number; name: string } | null
   setSelectedStudentForReport: React.Dispatch<React.SetStateAction<{ id: number; name: string } | null>>
   showGradeDropdown: boolean
@@ -125,14 +117,6 @@ interface AppContextState {
   setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>
   studentAnswers: any // Replace with a more specific type if possible
   setStudentAnswers: React.Dispatch<React.SetStateAction<any>>
-  showFeedbackModal: boolean
-  setShowFeedbackModal: React.Dispatch<React.SetStateAction<boolean>>
-  selectedStudentForFeedback: { id: number; name: string } | null
-  setSelectedStudentForFeedback: React.Dispatch<React.SetStateAction<{ id: number; name: string } | null>>
-  feedbackText: string
-  setFeedbackText: React.Dispatch<React.SetStateAction<string>>
-  studentFeedback: any // Replace with a more specific type if possible
-  setStudentFeedback: React.Dispatch<React.SetStateAction<any>>
   studentImages: any // Replace with a more specific type if possible
   setStudentImages: React.Dispatch<React.SetStateAction<any>>
   studentRecordings: any // Replace with a more specific type if possible
@@ -162,11 +146,10 @@ export const AppContext = createContext<AppContextState | undefined>(undefined)
 
 // Create the provider component
 export const AppContextProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedGrades, setSelectedGrades] = useState<number[]>([])
   const [currentScreen, setCurrentScreen] = useState('gradeSelection')
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [topic, setTopic] = useState('')
-  const [learningOutcomes, setLearningOutcomes] = useState<{ [key: number]: string }>({})
+  const [learningOutcomes, setLearningOutcomes] = useState<{ [key: string]: string }>({})
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [linkUrl, setLinkUrl] = useState('')
   const [uploadType, setUploadType] = useState<'file' | 'image' | 'link'>('file')
@@ -203,10 +186,8 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [carouselIndex, setCarouselIndex] = useState(0)
   const [cardPrompts, setCardPrompts] = useState(['', '', ''])
   const [cardResponses, setCardResponses] = useState(['', '', ''])
-  const [students, setStudents] = useState<{ [key: number]: { id: number; name: string }[] }>({})
+  // Students state removed - now managed by React Query
 
-  const [selectedGradeForStudents, setSelectedGradeForStudents] = useState<number | null>(null)
-  const [showAddStudentModal, setShowAddStudentModal] = useState(false)
   const [selectedStudentForReport, setSelectedStudentForReport] = useState<{ id: number; name: string } | null>(null)
   const [showGradeDropdown, setShowGradeDropdown] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -231,12 +212,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [assessmentResults, setAssessmentResults] = useState({})
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [studentAnswers, setStudentAnswers] = useState({})
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
-  const [selectedStudentForFeedback, setSelectedStudentForFeedback] = useState<{ id: number; name: string } | null>(
-    null,
-  )
-  const [feedbackText, setFeedbackText] = useState('')
-  const [studentFeedback, setStudentFeedback] = useState({})
   const [studentImages, setStudentImages] = useState({})
   const [studentRecordings, setStudentRecordings] = useState({})
   const [studentScores, setStudentScores] = useState({})
@@ -304,8 +279,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const lessonPlan = topic ? data[topic as keyof typeof data]?.outputs || [] : []
 
   const value = {
-    selectedGrades,
-    setSelectedGrades,
     currentScreen,
     setCurrentScreen,
     selectedAnswer,
@@ -370,12 +343,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     setCardPrompts,
     cardResponses,
     setCardResponses,
-    students,
-    setStudents,
-    selectedGradeForStudents,
-    setSelectedGradeForStudents,
-    showAddStudentModal,
-    setShowAddStudentModal,
     selectedStudentForReport,
     setSelectedStudentForReport,
     showGradeDropdown,
@@ -409,14 +376,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     setCurrentQuestionIndex,
     studentAnswers,
     setStudentAnswers,
-    showFeedbackModal,
-    setShowFeedbackModal,
-    selectedStudentForFeedback,
-    setSelectedStudentForFeedback,
-    feedbackText,
-    setFeedbackText,
-    studentFeedback,
-    setStudentFeedback,
     studentImages,
     setStudentImages,
     studentRecordings,

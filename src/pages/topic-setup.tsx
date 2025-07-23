@@ -1,4 +1,5 @@
 import React, { useContext } from 'react'
+import { useTitle } from '../hooks/use-title'
 import { useNavigate } from 'react-router'
 import { AppContext } from '../context/app-context'
 import BottomNav from '../components/bottom-nav'
@@ -9,10 +10,16 @@ import { Input } from '../components/ui/input'
 import { Textarea } from '../components/ui/textarea'
 import Header from '../components/header'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
+import { useLatestClassroom } from '../queries/classroom-queries'
+import { useCreateTopic } from '../mutations/topic-mutations'
+import { toast } from 'sonner'
 
 export default function TopicSetup() {
+  useTitle('Topic Setup')
   const context = useContext(AppContext)
   const navigate = useNavigate()
+
+  const { data: latestClassroom, isLoading, isError, error } = useLatestClassroom()
 
   if (!context) {
     return <div>Loading...</div>
@@ -23,8 +30,6 @@ export default function TopicSetup() {
     setTopic,
     learningOutcomes,
     setLearningOutcomes,
-    selectedGrades,
-    grades,
     uploadType,
     setUploadType,
     linkUrl,
@@ -35,14 +40,43 @@ export default function TopicSetup() {
     setSupportingMaterials,
   } = context
 
+  // Use grades from latest classroom as selectedGrades
+  const selectedGrades: { name: string; special_instructions?: string }[] = latestClassroom?.grades || []
+
+  // Topic creation state
+  const [topicCreatedId, setTopicCreatedId] = React.useState<number | null>(null)
+  const { mutate: createTopic, isPending: isCreatingTopic } = useCreateTopic()
+
+  const handleCreateTopic = () => {
+    if (!topic.trim()) return
+    // Build learning_outcomes array with grade_id (fallback to index if id missing)
+    const learning_outcomes = selectedGrades.map((grade, idx) => ({
+      learning_outcomes: learningOutcomes[grade.name] || '',
+      grade_id: (grade as any).id ?? idx + 1,
+    }))
+    createTopic(
+      { name: topic, learning_outcomes },
+      {
+        onSuccess: data => {
+          setTopicCreatedId(data.id)
+          toast.success('Topic created!')
+        },
+        onError: error => {
+          console.error(error)
+          toast.error('Failed to create topic.')
+        },
+      },
+    )
+  }
+
   const handleContinue = () => {
     navigate('/plan')
   }
 
-  const handleLearningOutcomeChange = (gradeId: number, value: string) => {
+  const handleLearningOutcomeChange = (gradeName: string, value: string) => {
     setLearningOutcomes(prev => ({
       ...prev,
-      [gradeId]: value,
+      [gradeName]: value,
     }))
   }
 
@@ -86,7 +120,14 @@ export default function TopicSetup() {
 
   const canContinueFromTopicSetup = () => {
     if (!topic.trim()) return false
-    return selectedGrades.every(gradeId => learningOutcomes[gradeId] && learningOutcomes[gradeId].trim())
+    return selectedGrades.every(g => learningOutcomes[g.name] && learningOutcomes[g.name].trim())
+  }
+
+  if (isLoading) {
+    return <div>Loading classroom...</div>
+  }
+  if (isError) {
+    return <div className="text-red-600">{(error as Error)?.message || 'Failed to load classroom.'}</div>
   }
 
   return (
@@ -105,6 +146,7 @@ export default function TopicSetup() {
                 value={topic}
                 onChange={e => setTopic(e.target.value)}
                 placeholder="e.g., Indian Geography, Mathematical Operations, etc."
+                disabled={!!topicCreatedId}
               />
             </CardContent>
           </Card>
@@ -115,25 +157,38 @@ export default function TopicSetup() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {selectedGrades.map(gradeId => {
-                  const grade = grades.find(g => g.id === gradeId)
-                  return (
-                    <div key={gradeId}>
-                      <label className="mb-1.5 block text-sm font-medium text-neutral-600">{grade?.name}</label>
-                      <Textarea
-                        value={learningOutcomes[gradeId] || ''}
-                        onChange={e => handleLearningOutcomeChange(gradeId, e.target.value)}
-                        placeholder="What should students learn from this topic?"
-                        rows={3}
-                      />
-                    </div>
-                  )
-                })}
+                {selectedGrades.map(grade => (
+                  <div key={grade.name}>
+                    <label className="mb-1.5 block text-sm font-medium text-neutral-600">{grade.name}</label>
+                    <Textarea
+                      value={learningOutcomes[grade.name] || ''}
+                      onChange={e => handleLearningOutcomeChange(grade.name, e.target.value)}
+                      placeholder="What should students learn from this topic?"
+                      rows={3}
+                      disabled={!!topicCreatedId}
+                    />
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="mb-3">
+          {/* Create Topic Button */}
+          <div className="mb-3 flex w-full justify-center">
+            <Button
+              onClick={handleCreateTopic}
+              size="lg"
+              className="rounded-xl px-4 py-3 text-base font-medium shadow-md transition-all duration-300 hover:shadow-lg"
+              disabled={!canContinueFromTopicSetup() || !!topicCreatedId || isCreatingTopic}
+            >
+              {isCreatingTopic ? 'Creating Topic...' : 'Create Topic'}
+            </Button>
+          </div>
+
+          {/* Supporting Material Section - disabled until topic is created */}
+          <Card
+            className={`mb-3 ${topicCreatedId ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-50'}`}
+          >
             <CardHeader>
               <CardTitle>Add Supporting Material (Optional)</CardTitle>
             </CardHeader>

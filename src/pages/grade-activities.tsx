@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from 'react-router'
+import { useTitle } from '../hooks/use-title'
 import { useContext } from 'react'
 import { AppContext } from '../context/app-context'
 import Header from '../components/header'
@@ -6,9 +7,10 @@ import { Button } from '../components/ui/button'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
 
 export default function GradeActivities() {
+  const { day, gradeId } = useParams()
+  useTitle(`Day ${day} | Grade ${gradeId} Activities`)
   const context = useContext(AppContext)
   const navigate = useNavigate()
-  const { day, gradeId } = useParams()
 
   if (!context) {
     return <div>Loading...</div>

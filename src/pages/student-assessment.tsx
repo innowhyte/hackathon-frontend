@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router'
+import { useTitle } from '../hooks/use-title'
 import { useContext, useState } from 'react'
 import { AppContext } from '../context/app-context'
 import BottomNav from '../components/bottom-nav'
@@ -10,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import AIHelpDialog from '../components/modals/ai-help-dialog'
 
 export default function StudentAssessment() {
+  useTitle('Student Assessment')
   const { assessmentId, studentId } = useParams()
   const context = useContext(AppContext)
   const navigate = useNavigate()
@@ -36,6 +38,7 @@ export default function StudentAssessment() {
   if (!assessment || !student) {
     return <div>Assessment or student not found</div>
   }
+  useTitle(`Assessing ${student.name}`)
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files

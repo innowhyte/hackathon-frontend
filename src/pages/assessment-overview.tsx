@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router'
+import { useTitle } from '../hooks/use-title'
 import { useContext } from 'react'
 import { AppContext } from '../context/app-context'
 import BottomNav from '../components/bottom-nav'
@@ -9,6 +10,7 @@ import { Badge } from '../components/ui/badge'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
 
 export default function AssessmentOverview() {
+  useTitle('Assessment Overview')
   const { assessmentId, grade } = useParams()
   const context = useContext(AppContext)
   const navigate = useNavigate()
@@ -50,6 +52,8 @@ export default function AssessmentOverview() {
       </div>
     )
   }
+
+  useTitle(`${assessment.title} | Grade ${gradeNumber}`)
 
   const handleSelectStudent = (student: { id: number; name: string }) => {
     navigate(`/assessment/${assessmentId}/student/${student.id}`)

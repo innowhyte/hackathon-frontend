@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from 'react-router'
+import { useTitle } from '../hooks/use-title'
 import { useContext } from 'react'
 import { AppContext } from '../context/app-context'
 import Header from '../components/header'
@@ -12,6 +13,7 @@ import QuestionPromptsDialog from '../components/modals/question-prompts-dialog'
 
 export default function WholeClassActivities() {
   const { day } = useParams()
+  useTitle(`Day ${day} | Whole Class Activities`)
   const context = useContext(AppContext)
   const navigate = useNavigate()
 
