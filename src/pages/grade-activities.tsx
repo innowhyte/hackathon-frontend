@@ -1,11 +1,25 @@
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { useTitle } from '../hooks/use-title'
-import { useContext } from 'react'
-import { AppContext } from '../context/app-context'
+import React from 'react'
 import Header from '../components/header'
 import { Button } from '../components/ui/button'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
 import Loading from '@/components/loading'
+
+const GRADE_ACTIVITIES_SELECTIONS_KEY = 'gradeActivitiesSelections'
+
+const modeOfInteractionOptions = [
+  { id: 'independent', label: 'Work independently' },
+  { id: 'peer', label: 'Work with each other' },
+  { id: 'teacher', label: 'Work with the teacher' },
+]
+
+const modalityOptions = [
+  { id: 'visual', label: 'Visual' },
+  { id: 'auditory', label: 'Auditory' },
+  { id: 'kinesthetic', label: 'Activity based' },
+  { id: 'paper', label: 'Paper/Slate based' },
+]
 
 export default function GradeActivities() {
   const { day, gradeId } = useParams()
@@ -13,61 +27,69 @@ export default function GradeActivities() {
   const topicIdParam = searchParams.get('topicId')
   const topicId = topicIdParam ? parseInt(topicIdParam) : null
   useTitle(`Day ${day} | Grade ${gradeId} Activities`)
-  const context = useContext(AppContext)
   const navigate = useNavigate()
 
-  if (!context) {
-    return <Loading message="Loading classroom..." />
-  }
+  // Local state for gradeActivitiesSelections
+  const [gradeActivitiesSelections, setGradeActivitiesSelections] = React.useState<Record<string, Record<string, any>>>(
+    () => {
+      try {
+        const stored = localStorage.getItem(GRADE_ACTIVITIES_SELECTIONS_KEY)
+        return stored ? JSON.parse(stored) : {}
+      } catch {
+        return {}
+      }
+    },
+  )
 
-  const {
-    activeGradeId,
-    gradeActivitiesSelections,
-    setGradeActivitiesSelections,
-    modeOfInteractionOptions,
-    modalityOptions,
-  } = context
+  // Save to localStorage on change
+  React.useEffect(() => {
+    localStorage.setItem(GRADE_ACTIVITIES_SELECTIONS_KEY, JSON.stringify(gradeActivitiesSelections))
+  }, [gradeActivitiesSelections])
 
-  // Determine if this is whole class activities or grade-specific activities
-  const isWholeClass = !gradeId
-  const currentGradeId = gradeId ? parseInt(gradeId) : activeGradeId
+  const currentGradeId = gradeId ? gradeId : 'whole_class'
 
   const handleModeSelect = (modeId: string) => {
-    setGradeActivitiesSelections((prev: any) => ({
-      ...prev,
-      [day as string]: {
-        ...prev[day as string],
-        [currentGradeId as number]: {
-          ...(prev[day as string]?.[currentGradeId as number] || {}),
-          mode: modeId,
-        },
-      },
-    }))
-  }
-
-  const handleModalityToggle = (modalityId: string) => {
-    setGradeActivitiesSelections((prev: any) => {
-      const current = prev[day as string]?.[currentGradeId as number]?.modalities || []
-      const newModalities = current.includes(modalityId)
-        ? current.filter((id: string) => id !== modalityId)
-        : [...current, modalityId]
-      return {
+    setGradeActivitiesSelections(prev => {
+      const updated = {
         ...prev,
         [day as string]: {
           ...prev[day as string],
-          [currentGradeId as number]: {
-            ...(prev[day as string]?.[currentGradeId as number] || {}),
+          [currentGradeId]: {
+            ...(prev[day as string]?.[currentGradeId] || {}),
+            mode: modeId,
+          },
+        },
+      }
+      return updated
+    })
+  }
+
+  const handleModalityToggle = (modalityId: string) => {
+    setGradeActivitiesSelections(prev => {
+      const current = prev[day as string]?.[currentGradeId]?.modalities || []
+      const newModalities = current.includes(modalityId)
+        ? current.filter((id: string) => id !== modalityId)
+        : [...current, modalityId]
+      const updated = {
+        ...prev,
+        [day as string]: {
+          ...prev[day as string],
+          [currentGradeId]: {
+            ...(prev[day as string]?.[currentGradeId] || {}),
             modalities: newModalities,
           },
         },
       }
+      return updated
     })
   }
+
+  const selections = gradeActivitiesSelections[day as string]?.[currentGradeId] || {}
 
   return (
     <div className="bg-background min-h-screen">
       <Header
-        title={isWholeClass ? 'Whole Class Activities' : `Grade ${currentGradeId} Activities`}
+        title={`Grade ${gradeId} Activities`}
         onBack={() => {
           if (topicId) {
             navigate(`/day/${day}?topicId=${topicId}`)
@@ -83,8 +105,7 @@ export default function GradeActivities() {
             <h3 className="mb-3 text-base font-medium text-neutral-800">Mode of Interaction</h3>
             <div className="flex flex-wrap gap-3">
               {modeOfInteractionOptions.map(option => {
-                const selected =
-                  gradeActivitiesSelections[day as string]?.[currentGradeId as number]?.mode === option.id
+                const selected = selections.mode === option.id
                 return (
                   <Button
                     key={option.id}
@@ -116,9 +137,7 @@ export default function GradeActivities() {
             </h3>
             <div className="flex flex-wrap gap-3">
               {modalityOptions.map(option => {
-                const selected = (
-                  gradeActivitiesSelections[day as string]?.[currentGradeId as number]?.modalities || []
-                ).includes(option.id)
+                const selected = (selections.modalities || []).includes(option.id)
                 return (
                   <Button
                     key={option.id}
@@ -145,21 +164,20 @@ export default function GradeActivities() {
             </div>
           </div>
           {/* Generate Button (always visible if ready) */}
-          {gradeActivitiesSelections[day as string]?.[currentGradeId as number]?.mode &&
-            (gradeActivitiesSelections[day as string]?.[currentGradeId as number]?.modalities || []).length > 0 && (
-              <Button
-                onClick={() => {
-                  if (topicId) {
-                    navigate(`/day/${day}/grade/${currentGradeId}/carousel?topicId=${topicId}`)
-                  } else {
-                    navigate(`/day/${day}/grade/${currentGradeId}/carousel`)
-                  }
-                }}
-                className="mb-8 w-full rounded-xl px-6 py-3 font-medium shadow-sm transition-all duration-200"
-              >
-                Generate
-              </Button>
-            )}
+          {selections.mode && (selections.modalities || []).length > 0 && (
+            <Button
+              onClick={() => {
+                if (topicId) {
+                  navigate(`/day/${day}/grade/${gradeId}/activities?topicId=${topicId}`)
+                } else {
+                  navigate(`/day/${day}/grade/${gradeId}/activities`)
+                }
+              }}
+              className="mb-8 w-full rounded-xl px-6 py-3 font-medium shadow-sm transition-all duration-200"
+            >
+              Generate
+            </Button>
+          )}
         </div>
       </div>
       <AIHelpDialog />

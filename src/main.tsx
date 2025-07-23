@@ -13,7 +13,7 @@ import AssessmentOverview from './pages/assessment-overview'
 import StudentAssessment from './pages/student-assessment'
 import GradeActivities from './pages/grade-activities'
 import WholeClassActivities from './pages/whole-class-activities'
-import CarouselPage from './pages/carousel-page'
+import Activities from './pages/activities-page'
 import NotFound from './pages/not-found'
 import './index.css'
 import { Toaster } from '@/components/ui/sonner'
@@ -63,12 +63,12 @@ const router = createBrowserRouter([
     element: <WholeClassActivities />,
   },
   {
-    path: '/day/:day/grade/:gradeId/activities',
+    path: '/day/:day/grade/:gradeId/generate-activities',
     element: <GradeActivities />,
   },
   {
-    path: '/day/:day/grade/:gradeId/carousel',
-    element: <CarouselPage />,
+    path: '/day/:day/grade/:gradeId/activities',
+    element: <Activities />,
   },
 ])
 

@@ -21,8 +21,7 @@ export default function WeeklyPlan() {
 
   // Get lesson plan from selected topic
   const selectedTopic = topics?.find(t => t.id === topicId)
-  const lessonPlan = data[selectedTopic?.name as keyof typeof data]?.outputs || []
-
+  const lessonPlan = data[selectedTopic?.name as keyof typeof data]?.outputs || {}
   useTitle(`Weekly Plan ${selectedTopic?.name ? `| ${selectedTopic?.name}` : ' | Select a Topic'}`)
 
   if (isLoadingTopics) {
@@ -52,33 +51,37 @@ export default function WeeklyPlan() {
             }}
           />
 
-          {topicId && lessonPlan.length > 0 ? (
+          {topicId && lessonPlan ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-              {lessonPlan.map((dayPlan: any) => (
+              {Object.entries(lessonPlan).map(([dayKey, dayPlan]: [string, any]) => (
                 <Button
-                  key={dayPlan.day}
-                  onClick={() => handleDaySelect(dayPlan.day)}
+                  key={dayKey}
+                  onClick={() => handleDaySelect(Number(dayKey.replace('day_', '')))}
                   variant="outline"
                   size="lg"
                   className="hover:bg-secondary border-border bg-card flex h-auto min-h-[160px] w-full flex-col items-start justify-start rounded-2xl border p-4 text-left break-words shadow-md transition-all duration-200 hover:shadow-lg sm:p-6"
                 >
-                  <div className="text-primary-40 mb-3 text-xl font-medium">Day {dayPlan.day}</div>
+                  <div className="text-primary-40 mb-3 text-xl font-medium">Day {dayKey.replace('day_', '')}</div>
                   <div className="text-muted-foreground w-full overflow-hidden text-sm leading-relaxed">
                     <p className="overflow-hidden break-words">
-                      {dayPlan.whole_class_introduction_plan.length > 50
-                        ? `${dayPlan.whole_class_introduction_plan.substring(0, 50)}...`
-                        : dayPlan.whole_class_introduction_plan}
+                      {typeof dayPlan.whole_class_introduction_plan === 'string'
+                        ? dayPlan.whole_class_introduction_plan.length > 50
+                          ? `${dayPlan.whole_class_introduction_plan.substring(0, 50)}...`
+                          : dayPlan.whole_class_introduction_plan
+                        : 'No introduction plan available.'}
                     </p>
                   </div>
                   <div className="mt-4 flex w-full flex-wrap gap-1">
-                    {dayPlan.grade_plans.map((gradePlan: any, idx: number) => (
-                      <span
-                        key={idx}
-                        className="bg-secondary flex-shrink-0 rounded-full px-2 py-1 text-xs whitespace-nowrap"
-                      >
-                        {gradePlan.grade}
-                      </span>
-                    ))}
+                    {Object.entries(dayPlan)
+                      .filter(([key]) => key.startsWith('grade_'))
+                      .map(([gradeKey, _], idx) => (
+                        <span
+                          key={idx}
+                          className="bg-secondary flex-shrink-0 rounded-full px-2 py-1 text-xs whitespace-nowrap"
+                        >
+                          {gradeKey.replace('grade_', 'Grade ')}
+                        </span>
+                      ))}
                   </div>
                 </Button>
               ))}

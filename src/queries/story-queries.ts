@@ -6,8 +6,8 @@ export interface Story {
   story: string
 }
 
-const fetchStoryByTopicId = async (topic_id: string): Promise<Story | null> => {
-  const response = await fetch(`${API_BASE_URL}/api/${topic_id}/story`)
+const fetchStoryByDayAndTopic = async (day_id: string, topic_id: string): Promise<Story | null> => {
+  const response = await fetch(`${API_BASE_URL}/api/day/${day_id}/topic/${topic_id}/story`)
   if (!response.ok) {
     if (response.status === 404) return null
     throw new Error('Failed to fetch story')
@@ -15,11 +15,11 @@ const fetchStoryByTopicId = async (topic_id: string): Promise<Story | null> => {
   return response.json()
 }
 
-export const useStoryByTopicId = (topic_id: string | null) => {
+export const useStoryByDayAndTopic = (day_id: string | null, topic_id: string | null) => {
   return useQuery({
-    queryKey: ['story', topic_id],
-    queryFn: () => fetchStoryByTopicId(topic_id!),
-    enabled: !!topic_id,
+    queryKey: ['story', day_id, topic_id],
+    queryFn: () => fetchStoryByDayAndTopic(day_id!, topic_id!),
+    enabled: !!day_id && !!topic_id,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   })

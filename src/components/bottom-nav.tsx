@@ -1,6 +1,23 @@
-import { NavLink } from 'react-router'
+import { NavLink, useSearchParams, useNavigate, useLocation } from 'react-router'
 
 export default function BottomNav() {
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const topicId = searchParams.get('topicId')
+
+  const handleNavigation = (path: string) => {
+    if (topicId) {
+      navigate(`${path}?topicId=${topicId}`)
+    } else {
+      navigate(path)
+    }
+  }
+
+  const isActive = (path: string) => {
+    return location.pathname === path
+  }
+
   return (
     <nav className="border-border shadow-elevation-3 bg-background/95 fixed bottom-0 left-0 z-50 w-full border-t-2 backdrop-blur-md">
       <div className="mx-auto flex max-w-2xl items-center justify-around py-2">
@@ -22,44 +39,38 @@ export default function BottomNav() {
           </svg>
           <span className="text-xs font-medium">Topic</span>
         </NavLink>
-        <NavLink
-          to="/weekly-plan"
-          className={({ isActive }) =>
-            `flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
-              isActive ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
-            }`
-          }
+        <button
+          onClick={() => handleNavigation('/weekly-plan')}
+          className={`flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
+            isActive('/weekly-plan') ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
+          }`}
         >
           <svg className="mb-1 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <rect x="4" y="4" width="16" height="16" rx="2" strokeWidth={2} />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h8M8 14h5" />
           </svg>
-          <span className="text-xs font-medium">Lesson Plan</span>
-        </NavLink>
-        <NavLink
-          to="/assessment"
-          className={({ isActive }) =>
-            `flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
-              isActive ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
-            }`
-          }
+          <span className="text-xs font-medium">Weekly Plan</span>
+        </button>
+        <button
+          onClick={() => handleNavigation('/assessment')}
+          className={`flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
+            isActive('/assessment') ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
+          }`}
         >
           <svg className="mb-1 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           <span className="text-xs font-medium">Assessment</span>
-        </NavLink>
-        <NavLink
-          to="/students"
-          className={({ isActive }) =>
-            `flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
-              isActive ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
-            }`
-          }
+        </button>
+        <button
+          onClick={() => handleNavigation('/students')}
+          className={`flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
+            isActive('/students') ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
+          }`}
         >
           <span className="material-icons mb-1 text-2xl">groups_2</span>
           <span className="text-xs font-medium">Students</span>
-        </NavLink>
+        </button>
       </div>
     </nav>
   )

@@ -3,12 +3,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export interface SaveStoryInput {
+  day_id: string
   topic_id: string
   story: string
 }
 
-const saveStory = async ({ topic_id, story }: SaveStoryInput): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/api/${topic_id}/save-story`, {
+const saveStory = async ({ day_id, topic_id, story }: SaveStoryInput): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/api/day/${day_id}/topic/${topic_id}/save-story`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -25,7 +26,7 @@ export const useSaveStory = () => {
   return useMutation({
     mutationFn: saveStory,
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['story', variables.topic_id] })
+      queryClient.invalidateQueries({ queryKey: ['story', variables.day_id, variables.topic_id] })
     },
   })
 }

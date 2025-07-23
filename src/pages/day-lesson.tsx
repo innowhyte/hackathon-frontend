@@ -11,6 +11,7 @@ import { data } from '../lib/data'
 import EmptyWeeklyPlan from '@/components/empty-weekly-plan'
 import { useSearchParams } from 'react-router'
 import Loading from '@/components/loading'
+import { useLatestClassroom } from '@/queries/classroom-queries'
 
 export default function DayLesson() {
   const { day } = useParams()
@@ -19,25 +20,26 @@ export default function DayLesson() {
   const topicId = topicIdParam ? parseInt(topicIdParam) : null
   const navigate = useNavigate()
 
+  const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
   const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
   const selectedTopic = topics?.find(t => t.id === topicId)
 
   useTitle(`Day ${day} ${selectedTopic?.name ? `| ${selectedTopic?.name}` : ' | Select a Topic'}`)
 
-  if (isLoadingTopics) {
-    return <Loading message="Loading topics..." />
+  if (isLoadingClassroom || isLoadingTopics) {
+    return <Loading message="Loading..." />
   }
 
   // Get lesson plan from selected topic
-  const lessonPlan = data[selectedTopic?.name as keyof typeof data]?.outputs || []
+  const lessonPlan = data[selectedTopic?.name as keyof typeof data]?.outputs || {}
   const selectedDay = parseInt(day || '1')
-  const currentDayPlan = lessonPlan.find((d: any) => d.day === selectedDay)
+  const currentDayPlan = lessonPlan[`day_${selectedDay}` as keyof typeof lessonPlan]
 
   const handleGradeActivitiesClick = (gradeId: number) => {
     if (topicId) {
-      navigate(`/day/${selectedDay}/grade/${gradeId}/activities?topicId=${topicId}`)
+      navigate(`/day/${selectedDay}/grade/${gradeId}/generate-activities?topicId=${topicId}`)
     } else {
-      navigate(`/day/${selectedDay}/grade/${gradeId}/activities`)
+      navigate(`/day/${selectedDay}/grade/${gradeId}/generate-activities`)
     }
   }
 
@@ -78,7 +80,7 @@ export default function DayLesson() {
                 </div>
                 <div className="bg-secondary rounded-xl p-4">
                   <p className="text-sm leading-relaxed text-neutral-700">
-                    {currentDayPlan.whole_class_introduction_plan}
+                    {currentDayPlan.whole_class_introduction_plan as string}
                   </p>
                 </div>
                 <div className="mt-4">
@@ -97,25 +99,27 @@ export default function DayLesson() {
                 </div>
               </div>
 
-              {currentDayPlan?.grade_plans.map((gradePlan: any, index: number) => {
-                const gradeNumber = parseInt(gradePlan.grade.replace('Grade ', ''))
+              {latestClassroom?.grades.map((grade: any, index: number) => {
+                const gradeNumber = parseInt(grade.name.replace('Grade ', ''))
                 return (
                   <div
                     key={index}
                     className="w-full rounded-2xl border border-neutral-200 bg-white/80 p-6 shadow-lg backdrop-blur-sm"
                   >
                     <div className="mb-4 flex items-center justify-between">
-                      <h3 className="text-xl font-medium text-neutral-800">{gradePlan.grade} Activities</h3>
+                      <h3 className="text-xl font-medium text-neutral-800">{grade.name} Activities</h3>
                       <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-full">
                         <span className="material-symbols-outlined text-white">cognition</span>
                       </div>
                     </div>
                     <div className="bg-secondary mb-4 rounded-xl p-4">
                       <h4 className="text-primary-10 mb-2 text-sm font-medium">Learning Objective:</h4>
-                      <p className="text-sm leading-relaxed text-neutral-700">{gradePlan.learning_objective}</p>
+                      <p className="text-sm leading-relaxed text-neutral-700">
+                        {currentDayPlan[`grade_${gradeNumber}` as keyof typeof currentDayPlan]}
+                      </p>
                     </div>
                     <Button
-                      onClick={() => handleGradeActivitiesClick(gradeNumber)}
+                      onClick={() => handleGradeActivitiesClick(grade.id)}
                       className="w-full rounded-xl px-4 py-3 font-medium transition-all duration-200"
                     >
                       Create Grade Activities

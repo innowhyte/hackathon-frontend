@@ -49,8 +49,7 @@ export default function StudentsList({
               <UsersIcon className="text-primary h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-foreground text-xl font-semibold">Grade {selectedGrade.name}</h2>
-              <p className="text-muted-foreground text-sm">Loading students...</p>
+              <h2 className="text-foreground text-xl font-semibold">{selectedGrade.name}</h2>
             </div>
           </div>
           <Button
@@ -83,8 +82,7 @@ export default function StudentsList({
               <UsersIcon className="text-primary h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-foreground text-xl font-semibold">Grade {selectedGrade.name}</h2>
-              <p className="text-muted-foreground text-sm">Error loading students</p>
+              <h2 className="text-foreground text-xl font-semibold">{selectedGrade.name}</h2>
             </div>
           </div>
           <Button
@@ -117,7 +115,7 @@ export default function StudentsList({
             <UsersIcon className="text-primary h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-foreground text-xl font-semibold">Grade {selectedGrade.name}</h2>
+            <h2 className="text-foreground text-xl font-semibold">{selectedGrade.name}</h2>
             <p className="text-muted-foreground text-sm">
               {students.length || 0} students
               {isFeedbackLoading && ' • Loading feedback...'}

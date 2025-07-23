@@ -45,10 +45,10 @@ export default function WholeClassActivities() {
 
   // Get lesson plan from selected topic
   const selectedTopic = topics?.find(t => t.id === topicId)
-  const lessonPlan = data[selectedTopic?.name as keyof typeof data]?.outputs || []
+  const lessonPlan: Record<string, any> = data[selectedTopic?.name as keyof typeof data]?.outputs || {}
 
   const selectedDay = parseInt(day || '1')
-  const currentDayPlan = lessonPlan.find((d: any) => d.day === selectedDay)
+  const currentDayPlan = lessonPlan ? lessonPlan[`day_${selectedDay}`] : undefined
 
   const activityOptions = [
     {
@@ -157,13 +157,12 @@ export default function WholeClassActivities() {
       {/* Dialogs */}
       <AIHelpDialog />
       <BlackboardDialog showBlackboardDialog={showBlackboardDialog} setShowBlackboardDialog={setShowBlackboardDialog} />
-      {selectedTopic && (
+      {topicId && day && (
         <StoryDialog
-          topic={selectedTopic?.name}
-          topic_id={topicId?.toString() || ''}
+          topic_id={topicId.toString()}
+          day_id={day?.toString()}
           showStoryDialog={showStoryDialog}
           setShowStoryDialog={setShowStoryDialog}
-          concept_to_introduce={currentDayPlan?.whole_class_introduction_plan || ''}
           latestClassroom={latestClassroom}
         />
       )}

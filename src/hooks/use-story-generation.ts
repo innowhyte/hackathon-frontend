@@ -11,10 +11,9 @@ export interface StoryGenerationState {
 
 export interface StoryGenerationOptions {
   latestClassroom: Classroom
+  day_id: string
   topic_id: string
-  topic: string
-  context: string
-  concept_to_introduce: string
+  context: string // This will be mapped to teacher_requirements
   thread_id: string
   onProgress?: (progress: string) => void
   onStoryGenerated?: (story: string) => void
@@ -35,17 +34,7 @@ export const useStoryGeneration = () => {
 
     let isMounted = true
 
-    const {
-      latestClassroom,
-      topic_id,
-      topic,
-      context,
-      concept_to_introduce,
-      thread_id,
-      onProgress,
-      onStoryGenerated,
-      onError,
-    } = options
+    const { latestClassroom, day_id, topic_id, context, thread_id, onProgress, onStoryGenerated, onError } = options
 
     // Reset state
     setIsGenerating(true)
@@ -53,7 +42,7 @@ export const useStoryGeneration = () => {
     setStory('')
     setError(null)
 
-    await fetchEventSource(`${API_BASE_URL}/api/${topic_id}/generate-story`, {
+    await fetchEventSource(`${API_BASE_URL}/api/day/${day_id}/topic/${topic_id}/generate-story`, {
       signal: abortController.signal,
       openWhenHidden: true,
       method: 'POST',
@@ -61,14 +50,9 @@ export const useStoryGeneration = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        topic,
-        context,
         thread_id,
         classroom_id: String(latestClassroom.id),
-        location: latestClassroom.location,
-        language: latestClassroom.language,
-        concept_to_introduce: concept_to_introduce,
-        grades: latestClassroom.grades.map(grade => grade.name),
+        teacher_requirements: context || undefined,
       }),
       onmessage(event) {
         const { event: eventType, data } = event

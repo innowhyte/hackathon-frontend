@@ -1,6 +1,6 @@
-import { useNavigate } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import { useTitle } from '../hooks/use-title'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { AppContext } from '../context/app-context'
 import BottomNav from '../components/bottom-nav'
 import Header from '../components/header'
@@ -14,22 +14,31 @@ import {
 } from '../components/ui/dropdown-menu'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
 import { useLatestClassroom } from '../queries/classroom-queries'
+import { useAllTopics } from '../queries/topic-queries'
+import TopicSelector from '../components/topic-selector'
 import Loading from '@/components/loading'
 
 export default function TopicAssessment() {
-  useTitle('Topic Assessment')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const topicIdParam = searchParams.get('topicId')
+  const topicId = topicIdParam ? parseInt(topicIdParam) : null
+  const [selectedGradeForAssessment, setSelectedGradeForAssessment] = useState<number | null>(null)
+
   const context = useContext(AppContext)
   const navigate = useNavigate()
   const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
+  const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
 
-  if (!context || isLoadingClassroom) {
-    return <Loading message="Loading classroom..." />
+  // Get selected topic
+  const selectedTopic = topics?.find(t => t.id === topicId)
+
+  useTitle(`Topic Assessment ${selectedTopic?.name ? `| ${selectedTopic?.name}` : ' | Select a Topic'}`)
+
+  if (!context || isLoadingClassroom || isLoadingTopics) {
+    return <Loading message="Loading..." />
   }
 
   const {
-    topic,
-    selectedGradeForAssessment,
-    setSelectedGradeForAssessment,
     selectedAssessmentType,
     setSelectedAssessmentType,
     generatedAssessment,
@@ -42,27 +51,14 @@ export default function TopicAssessment() {
     setAssessmentOptions,
   } = context
 
-  // Map grades from latestClassroom to expected format
-  const gradesList = [
-    { id: 1, name: 'Grade 1' },
-    { id: 2, name: 'Grade 2' },
-    { id: 3, name: 'Grade 3' },
-    { id: 4, name: 'Grade 4' },
-    { id: 5, name: 'Grade 5' },
-  ]
-  const selectedGrades = (latestClassroom?.grades || [])
-    .map(g => {
-      const gradeObj = gradesList.find(gr => gr.name === g.name)
-      return gradeObj ? { gradeId: gradeObj.id, specialInstructions: g.special_instructions || '' } : undefined
-    })
-    .filter((g): g is { gradeId: number; specialInstructions: string } => g !== undefined)
+  const selectedGrades = latestClassroom?.grades || []
 
   const handleGenerateAssessment = () => {
-    if (selectedGradeForAssessment && selectedAssessmentType) {
+    if (selectedGradeForAssessment && selectedAssessmentType && selectedTopic) {
       const currentOptions = assessmentOptions[selectedAssessmentType as keyof typeof assessmentOptions]
       const sampleAssessments = {
         written: {
-          title: `Written Test - ${topic}`,
+          title: `Written Test - ${selectedTopic.name}`,
           type: 'Written Test',
           answerType: currentOptions.answerType,
           numberOfQuestions: currentOptions.numberOfQuestions,
@@ -70,7 +66,7 @@ export default function TopicAssessment() {
           instructions: `Answer all ${currentOptions.numberOfQuestions} questions.`,
         },
         oral: {
-          title: `Oral Assessment - ${topic}`,
+          title: `Oral Assessment - ${selectedTopic.name}`,
           type: 'Oral Assessment',
           numberOfWords: currentOptions.numberOfWords,
           difficultyLevel: currentOptions.difficultyLevel,
@@ -78,7 +74,7 @@ export default function TopicAssessment() {
           instructions: `Be prepared to answer questions orally.`,
         },
         project: {
-          title: `Project-Based Assessment - ${topic}`,
+          title: `Project-Based Assessment - ${selectedTopic.name}`,
           type: 'Project-Based Assessment',
           projectType: currentOptions.projectType,
           questions: [], // Generate questions dynamically
@@ -90,12 +86,13 @@ export default function TopicAssessment() {
   }
 
   const handleSaveAssessment = () => {
-    if (generatedAssessment) {
+    if (generatedAssessment && selectedTopic) {
       const newAssessment = {
         id: Date.now(),
         ...generatedAssessment,
         grade: selectedGradeForAssessment,
-        topic: topic,
+        topic: selectedTopic.name,
+        topicId: selectedTopic.id,
         prompt: assessmentPrompt,
         savedAt: new Date().toLocaleDateString(),
       }
@@ -108,39 +105,67 @@ export default function TopicAssessment() {
 
   return (
     <div className="bg-background min-h-screen pb-20">
-      <Header title="Topic Assessment" onBack={() => navigate('/weekly-plan')} />
+      <Header
+        title="Topic Assessment"
+        onBack={() => {
+          if (topicId) {
+            navigate(`/weekly-plan?topicId=${topicId}`)
+          } else {
+            navigate('/weekly-plan')
+          }
+        }}
+      />
 
       <div className="p-4">
         <div className="mx-auto max-w-md space-y-6">
-          {/* Main Title */}
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-neutral-800">Assessment for Addition</h1>
-            <p className="mt-1 text-sm text-neutral-600">Generate assessments based on your selected grades.</p>
+          {/* Topic Selection */}
+          <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
+            <h2 className="mb-3 text-base font-medium text-neutral-800">Select Topic for Assessment</h2>
+            <TopicSelector
+              selectedTopicId={topicId}
+              onTopicChange={topicId => {
+                if (topicId) {
+                  setSearchParams({ topicId: topicId.toString() })
+                } else {
+                  setSearchParams({})
+                }
+              }}
+            />
           </div>
+
+          {/* Main Title */}
+          {selectedTopic && (
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-neutral-800">Assessment for {selectedTopic.name}</h1>
+              <p className="mt-1 text-sm text-neutral-600">Generate assessments based on your selected grades.</p>
+            </div>
+          )}
 
           {/* Grade Selection */}
-          <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 text-base font-medium text-neutral-800">Select Grade for Assessment</h2>
-            <div className="flex gap-2">
-              {selectedGrades.length > 0 ? (
-                selectedGrades.map(g => (
-                  <Button
-                    key={g.gradeId}
-                    onClick={() => setSelectedGradeForAssessment(g.gradeId)}
-                    variant={selectedGradeForAssessment === g.gradeId ? 'default' : 'outline'}
-                    className="flex-1 py-2 text-sm"
-                  >
-                    Grade {g.gradeId}
-                  </Button>
-                ))
-              ) : (
-                <span className="text-sm text-neutral-500">No grades found. Please set up grades first.</span>
-              )}
+          {selectedTopic && (
+            <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
+              <h2 className="mb-3 text-base font-medium text-neutral-800">Select Grade for Assessment</h2>
+              <div className="flex gap-2">
+                {selectedGrades.length > 0 ? (
+                  selectedGrades.map(g => (
+                    <Button
+                      key={g.id}
+                      onClick={() => setSelectedGradeForAssessment(g.id)}
+                      variant={selectedGradeForAssessment === g.id ? 'default' : 'outline'}
+                      className="flex-1 py-2 text-sm"
+                    >
+                      {g.name}
+                    </Button>
+                  ))
+                ) : (
+                  <span className="text-sm text-neutral-500">No grades found. Please set up grades first.</span>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Assessment Type Selection */}
-          {selectedGradeForAssessment && (
+          {selectedGradeForAssessment && selectedTopic && (
             <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
               <h2 className="mb-3 text-base font-medium text-neutral-800">Select Assessment Type</h2>
               <div className="space-y-3">
@@ -239,7 +264,7 @@ export default function TopicAssessment() {
           )}
 
           {/* Options Section */}
-          {selectedAssessmentType && (
+          {selectedAssessmentType && selectedTopic && (
             <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
               <h2 className="mb-3 text-base font-medium text-neutral-800">Assessment Options</h2>
               <div className="space-y-4">
@@ -427,7 +452,7 @@ export default function TopicAssessment() {
                 <Button
                   onClick={handleGenerateAssessment}
                   className="bg-primary hover:bg-primary/90 w-full text-white"
-                  disabled={!selectedGradeForAssessment || !selectedAssessmentType}
+                  disabled={!selectedGradeForAssessment || !selectedAssessmentType || !selectedTopic}
                 >
                   Generate Assessment
                 </Button>
@@ -436,7 +461,7 @@ export default function TopicAssessment() {
           )}
 
           {/* Generated Assessment Preview */}
-          {generatedAssessment && (
+          {generatedAssessment && selectedTopic && (
             <div>
               <h2 className="mb-3 text-base font-medium text-neutral-800">Generated Assessment</h2>
               <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
@@ -532,7 +557,7 @@ export default function TopicAssessment() {
                     <h4 className="mb-2 font-medium text-purple-800">Project Requirements</h4>
                     <div className="space-y-1 text-sm text-purple-700">
                       <p>• Students will create a {assessmentOptions.project.projectType}</p>
-                      <p>• Project should demonstrate understanding of {topic}</p>
+                      <p>• Project should demonstrate understanding of {selectedTopic.name}</p>
                       <p>• Students have {generatedAssessment.duration} minutes to complete</p>
                       <p>• Assessment includes both process and final product</p>
                     </div>
@@ -559,62 +584,68 @@ export default function TopicAssessment() {
           )}
 
           {/* Saved Assessments */}
-          <div>
-            <h2 className="mb-3 text-base font-medium text-neutral-800">Saved Assessments</h2>
-            <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
-              {savedAssessments.length > 0 ? (
-                <div className="space-y-3">
-                  {savedAssessments.map((assessment: any) => (
-                    <div
-                      key={assessment.id}
-                      className="flex items-center justify-between rounded-lg border border-neutral-200 p-3"
-                    >
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-neutral-800">{assessment.title}</span>
-                        <span className="text-xs text-neutral-600">Grade {assessment.grade}</span>
-                      </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="bg-neutral-100 text-xs text-neutral-800 hover:bg-neutral-200"
-                          >
-                            Actions
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => navigate(`/assessment/${assessment.id}/conduct/grade/${assessment.grade}`)}
-                          >
-                            Conduct Assessment
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              // Handle edit functionality
-                              console.log('Edit assessment:', assessment.id)
-                            }}
-                          >
-                            Edit Assessment
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              // Handle delete functionality
-                              setSavedAssessments((prev: any[]) => prev.filter((a: any) => a.id !== assessment.id))
-                            }}
-                          >
-                            Delete Assessment
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-sm text-neutral-500">No saved assessments.</p>
-              )}
+          {selectedTopic && (
+            <div>
+              <h2 className="mb-3 text-base font-medium text-neutral-800">Saved Assessments</h2>
+              <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
+                {savedAssessments.filter((assessment: any) => assessment.topicId === selectedTopic.id).length > 0 ? (
+                  <div className="space-y-3">
+                    {savedAssessments
+                      .filter((assessment: any) => assessment.topicId === selectedTopic.id)
+                      .map((assessment: any) => (
+                        <div
+                          key={assessment.id}
+                          className="flex items-center justify-between rounded-lg border border-neutral-200 p-3"
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium text-neutral-800">{assessment.title}</span>
+                            <span className="text-xs text-neutral-600">Grade {assessment.grade}</span>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="bg-neutral-100 text-xs text-neutral-800 hover:bg-neutral-200"
+                              >
+                                Actions
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  navigate(`/assessment/${assessment.id}/conduct/grade/${assessment.grade}`)
+                                }
+                              >
+                                Conduct Assessment
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  // Handle edit functionality
+                                  console.log('Edit assessment:', assessment.id)
+                                }}
+                              >
+                                Edit Assessment
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  // Handle delete functionality
+                                  setSavedAssessments((prev: any[]) => prev.filter((a: any) => a.id !== assessment.id))
+                                }}
+                              >
+                                Delete Assessment
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-sm text-neutral-500">No saved assessments for {selectedTopic.name}.</p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
