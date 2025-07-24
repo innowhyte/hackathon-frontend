@@ -104,8 +104,6 @@ interface AppContextState {
   setAssessmentPrompt: React.Dispatch<React.SetStateAction<string>>
   savedAssessments: any[] // Replace with a more specific type if possible
   setSavedAssessments: React.Dispatch<React.SetStateAction<any[]>>
-  assessmentOptions: any // Replace with a more specific type if possible
-  setAssessmentOptions: React.Dispatch<React.SetStateAction<any>>
   selectedAssessment: any // Replace with a more specific type if possible
   setSelectedAssessment: React.Dispatch<React.SetStateAction<any>>
   selectedStudentForAssessment: { id: number; name: string } | null
@@ -199,11 +197,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [generatedAssessment, setGeneratedAssessment] = useState(null)
   const [assessmentPrompt, setAssessmentPrompt] = useState('')
   const [savedAssessments, setSavedAssessments] = useState<any[]>([])
-  const [assessmentOptions, setAssessmentOptions] = useState({
-    written: { numberOfQuestions: 5, answerType: 'mcq' },
-    oral: { numberOfWords: 100, difficultyLevel: 'medium' },
-    project: { projectType: 'poster' },
-  })
+
   const [selectedAssessment, setSelectedAssessment] = useState(null)
   const [selectedStudentForAssessment, setSelectedStudentForAssessment] = useState<{ id: number; name: string } | null>(
     null,
@@ -364,8 +358,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     setAssessmentPrompt,
     savedAssessments,
     setSavedAssessments,
-    assessmentOptions,
-    setAssessmentOptions,
     selectedAssessment,
     setSelectedAssessment,
     selectedStudentForAssessment,

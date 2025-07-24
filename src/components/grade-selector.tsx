@@ -17,7 +17,7 @@ export default function GradeSelector({ selectedGrade, grades, onGradeChange, is
     <div className="mb-8">
       <label className="text-foreground mb-3 block text-sm font-medium">Select Grade</label>
       <Select
-        value={selectedGrade?.id.toString()}
+        value={selectedGrade ? selectedGrade.id.toString() : ''}
         onValueChange={value => onGradeChange(Number(value))}
         disabled={isLoading}
       >

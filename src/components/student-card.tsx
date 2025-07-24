@@ -1,5 +1,6 @@
 import { Button } from './ui/button'
 import { MessageSquareIcon, EditIcon, Trash2Icon } from 'lucide-react'
+import { useNavigate } from 'react-router'
 
 interface Student {
   id: number
@@ -13,6 +14,7 @@ interface StudentCardProps {
   onOpenEdit: (student: Student) => void
   onRemove: (studentId: number) => void
   isRemoving?: boolean
+  gradeId: number
 }
 
 export default function StudentCard({
@@ -22,9 +24,14 @@ export default function StudentCard({
   onOpenEdit,
   onRemove,
   isRemoving = false,
+  gradeId,
 }: StudentCardProps) {
+  const navigate = useNavigate()
   return (
-    <div className="hover:bg-muted/50 flex items-center justify-between p-4 transition-colors">
+    <div
+      className="hover:bg-muted/50 flex cursor-pointer items-center justify-between p-4 transition-colors"
+      onClick={() => navigate(`/grade/${gradeId}/students/${student.id}`)}
+    >
       <div className="flex items-center space-x-3">
         <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium">
           {student.name.charAt(0).toUpperCase()}
@@ -33,7 +40,10 @@ export default function StudentCard({
       </div>
       <div className="flex items-center space-x-2">
         <Button
-          onClick={() => onOpenFeedback(student)}
+          onClick={e => {
+            e.stopPropagation()
+            onOpenFeedback(student)
+          }}
           variant="ghost"
           size="sm"
           className="text-muted-foreground hover:text-primary hover:bg-primary/10 border-border hover:border-primary relative h-8 w-8 rounded-lg border p-0 transition-colors"
@@ -47,7 +57,10 @@ export default function StudentCard({
           )}
         </Button>
         <Button
-          onClick={() => onOpenEdit(student)}
+          onClick={e => {
+            e.stopPropagation()
+            onOpenEdit(student)
+          }}
           variant="ghost"
           size="sm"
           className="text-muted-foreground hover:text-primary hover:bg-primary/10 border-border hover:border-primary h-8 w-8 rounded-lg border p-0 transition-colors"
@@ -56,7 +69,10 @@ export default function StudentCard({
           <EditIcon className="h-4 w-4" />
         </Button>
         <Button
-          onClick={() => onRemove(student.id)}
+          onClick={e => {
+            e.stopPropagation()
+            onRemove(student.id)
+          }}
           variant="ghost"
           size="sm"
           disabled={isRemoving}

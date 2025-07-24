@@ -1,12 +1,14 @@
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { useTitle } from '../hooks/use-title'
-import React from 'react'
+import { useState, useEffect } from 'react'
 import Header from '../components/header'
 import { Button } from '../components/ui/button'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
-import Loading from '@/components/loading'
-
-const GRADE_ACTIVITIES_SELECTIONS_KEY = 'gradeActivitiesSelections'
+import { useGradeActivitiesGeneration } from '../hooks/use-grade-activities'
+import { useActivitiesByDayGradeTopic, type Activity } from '../queries/activities-queries'
+import { useSaveActivities } from '../mutations/activities-mutations'
+import { toast } from 'sonner'
+import { Loader2, Send, Save } from 'lucide-react'
 
 const modeOfInteractionOptions = [
   { id: 'independent', label: 'Work independently' },
@@ -22,74 +24,139 @@ const modalityOptions = [
 ]
 
 export default function GradeActivities() {
-  const { day, gradeId } = useParams()
+  const { day, gradeId } = useParams<{ day: string; gradeId: string }>()
   const [searchParams] = useSearchParams()
   const topicIdParam = searchParams.get('topicId')
   const topicId = topicIdParam ? parseInt(topicIdParam) : null
-  useTitle(`Day ${day} | Grade ${gradeId} Activities`)
+  useTitle(`Day ${day} | Activities`)
   const navigate = useNavigate()
 
-  // Local state for gradeActivitiesSelections
-  const [gradeActivitiesSelections, setGradeActivitiesSelections] = React.useState<Record<string, Record<string, any>>>(
-    () => {
-      try {
-        const stored = localStorage.getItem(GRADE_ACTIVITIES_SELECTIONS_KEY)
-        return stored ? JSON.parse(stored) : {}
-      } catch {
-        return {}
-      }
-    },
+  // Activities generation hook
+  const { isGenerating, progress, error, generateActivities, reset } = useGradeActivitiesGeneration()
+
+  // Activities query and mutation
+  const { data: fetchedActivities, isLoading: isActivitiesLoading } = useActivitiesByDayGradeTopic(
+    day || '',
+    gradeId || '',
+    topicId?.toString() || '',
   )
+  const saveActivitiesMutation = useSaveActivities()
 
-  // Save to localStorage on change
-  React.useEffect(() => {
-    localStorage.setItem(GRADE_ACTIVITIES_SELECTIONS_KEY, JSON.stringify(gradeActivitiesSelections))
-  }, [gradeActivitiesSelections])
+  // State for activities generation
+  const [threadId] = useState(() => crypto.randomUUID())
+  const [generatedActivities, setGeneratedActivities] = useState<Activity[]>([])
+  const [teacher_requirements, setTeacherRequirements] = useState('')
+  const [carouselIndex, setCarouselIndex] = useState(0)
+  const [modalities, setModalities] = useState<string[]>([])
+  const [modes_of_interaction, setModesOfInteraction] = useState<string>('')
 
-  const currentGradeId = gradeId ? gradeId : 'whole_class'
+  // Separate effect for fetched data
+  useEffect(() => {
+    if (fetchedActivities) {
+      setModalities(fetchedActivities.modalities)
+      setModesOfInteraction(fetchedActivities.modes_of_interaction)
+      setTeacherRequirements('')
+    }
+  }, [fetchedActivities])
+
+  // Separate effect for cleanup when no data
+  useEffect(() => {
+    if (!fetchedActivities) {
+      setModalities([])
+      setModesOfInteraction('')
+      setGeneratedActivities([])
+      setTeacherRequirements('')
+      setCarouselIndex(0)
+      reset()
+    }
+  }, [fetchedActivities, reset])
+
+  // Reset carousel index when activities change
+  useEffect(() => {
+    setCarouselIndex(0)
+  }, [generatedActivities, fetchedActivities])
 
   const handleModeSelect = (modeId: string) => {
-    setGradeActivitiesSelections(prev => {
-      const updated = {
-        ...prev,
-        [day as string]: {
-          ...prev[day as string],
-          [currentGradeId]: {
-            ...(prev[day as string]?.[currentGradeId] || {}),
-            mode: modeId,
-          },
-        },
-      }
-      return updated
-    })
+    setModesOfInteraction(modeId)
   }
 
   const handleModalityToggle = (modalityId: string) => {
-    setGradeActivitiesSelections(prev => {
-      const current = prev[day as string]?.[currentGradeId]?.modalities || []
+    setModalities(prev => {
+      const current = prev || []
       const newModalities = current.includes(modalityId)
         ? current.filter((id: string) => id !== modalityId)
         : [...current, modalityId]
-      const updated = {
-        ...prev,
-        [day as string]: {
-          ...prev[day as string],
-          [currentGradeId]: {
-            ...(prev[day as string]?.[currentGradeId] || {}),
-            modalities: newModalities,
-          },
-        },
-      }
-      return updated
+      return newModalities
     })
   }
 
-  const selections = gradeActivitiesSelections[day as string]?.[currentGradeId] || {}
+  // Get mode label for API
+  const selectedMode = modeOfInteractionOptions.find(option => option.id === modes_of_interaction)
+  const modes_of_interaction_label = selectedMode?.label || ''
+
+  // Get modality labels for API
+  const modalitiesForApi = (modalities || []).map(modalityId => {
+    const modality = modalityOptions.find(option => option.id === modalityId)
+    return modality?.label || modalityId
+  })
+
+  const handleGenerateActivities = async () => {
+    // Generate activities
+    await generateActivities({
+      day_id: day as string,
+      grade_id: gradeId as string,
+      topic_id: topicId?.toString() || '',
+      thread_id: threadId,
+      modes_of_interaction: modes_of_interaction_label,
+      modalities: modalitiesForApi,
+      teacher_requirements,
+      onActivitiesGenerated: (activitiesData: Activity[]) => {
+        setGeneratedActivities(activitiesData)
+        setCarouselIndex(0)
+      },
+      onError: errorMessage => {
+        console.error('Error:', errorMessage)
+        toast.error('Failed to generate activities')
+      },
+    })
+  }
+
+  const handleSaveToDatabase = () => {
+    if (!generatedActivities.length) return
+    saveActivitiesMutation.mutate(
+      {
+        day_id: day as string,
+        grade_id: gradeId as string,
+        topic_id: topicId?.toString() || '',
+        modes_of_interaction: modes_of_interaction,
+        modalities: modalities,
+        activities: generatedActivities,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Activities saved!')
+        },
+        onError: () => {
+          toast.error('Failed to save activities')
+        },
+      },
+    )
+  }
+
+  const handlePrevious = () => {
+    const activities = generatedActivities.length > 0 ? generatedActivities : fetchedActivities?.activities || []
+    setCarouselIndex((carouselIndex - 1 + activities.length) % activities.length)
+  }
+
+  const handleNext = () => {
+    const activities = generatedActivities.length > 0 ? generatedActivities : fetchedActivities?.activities || []
+    setCarouselIndex((carouselIndex + 1) % activities.length)
+  }
 
   return (
     <div className="bg-background min-h-screen">
       <Header
-        title={`Grade ${gradeId} Activities`}
+        title={`Day ${day} Activities`}
         onBack={() => {
           if (topicId) {
             navigate(`/day/${day}?topicId=${topicId}`)
@@ -105,7 +172,7 @@ export default function GradeActivities() {
             <h3 className="mb-3 text-base font-medium text-neutral-800">Mode of Interaction</h3>
             <div className="flex flex-wrap gap-3">
               {modeOfInteractionOptions.map(option => {
-                const selected = selections.mode === option.id
+                const selected = modes_of_interaction === option.id
                 return (
                   <Button
                     key={option.id}
@@ -131,13 +198,14 @@ export default function GradeActivities() {
               })}
             </div>
           </div>
+          {/* Modality */}
           <div className="mb-8">
             <h3 className="mb-3 text-base font-medium text-neutral-800">
               Modality <span className="text-xs text-neutral-500">(Select all that apply)</span>
             </h3>
             <div className="flex flex-wrap gap-3">
               {modalityOptions.map(option => {
-                const selected = (selections.modalities || []).includes(option.id)
+                const selected = modalities.includes(option.id)
                 return (
                   <Button
                     key={option.id}
@@ -163,21 +231,239 @@ export default function GradeActivities() {
               })}
             </div>
           </div>
-          {/* Generate Button (always visible if ready) */}
-          {selections.mode && (selections.modalities || []).length > 0 && (
-            <Button
-              onClick={() => {
-                if (topicId) {
-                  navigate(`/day/${day}/grade/${gradeId}/activities?topicId=${topicId}`)
-                } else {
-                  navigate(`/day/${day}/grade/${gradeId}/activities`)
-                }
-              }}
-              className="mb-8 w-full rounded-xl px-6 py-3 font-medium shadow-sm transition-all duration-200"
-            >
-              Generate
-            </Button>
+
+          {/* Activities Display */}
+          <div className="mb-6">
+            {isActivitiesLoading ? (
+              <div className="bg-muted rounded-xl p-4 text-center text-sm">Loading activities...</div>
+            ) : generatedActivities.length > 0 ? (
+              <div className="bg-muted rounded-xl p-4">
+                <h4 className="text-foreground mb-3 flex items-center text-lg font-medium">
+                  <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                  Generated Activities
+                </h4>
+                <div className="relative w-full">
+                  <div className="mb-6 min-h-[180px] rounded-2xl bg-white/90 p-6 shadow-lg">
+                    <h4 className="mb-4 text-xl font-semibold text-neutral-800">
+                      {generatedActivities[carouselIndex]?.name}
+                    </h4>
+                    <div className="space-y-4">
+                      {generatedActivities[carouselIndex]?.purpose && (
+                        <div>
+                          <h5 className="mb-2 text-sm font-semibold text-neutral-700">Purpose</h5>
+                          <p className="text-sm leading-relaxed text-neutral-600">
+                            {generatedActivities[carouselIndex].purpose}
+                          </p>
+                        </div>
+                      )}
+                      {generatedActivities[carouselIndex]?.materials_required &&
+                        generatedActivities[carouselIndex].materials_required.length > 0 && (
+                          <div>
+                            <h5 className="mb-2 text-sm font-semibold text-neutral-700">Materials Required</h5>
+                            <p className="text-sm leading-relaxed text-neutral-600">
+                              {generatedActivities[carouselIndex].materials_required.join(', ')}
+                            </p>
+                          </div>
+                        )}
+                      <div>
+                        <h5 className="mb-2 text-sm font-semibold text-neutral-700">Instructions</h5>
+                        <p className="text-sm leading-relaxed text-neutral-600">
+                          {generatedActivities[carouselIndex]?.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Carousel Navigation */}
+                  <div className="flex w-full items-center justify-between px-4">
+                    <Button
+                      onClick={handlePrevious}
+                      variant="outline"
+                      size="icon"
+                      className="rounded-full bg-neutral-200 p-2 hover:bg-neutral-300"
+                      aria-label="Previous"
+                    >
+                      <svg className="h-5 w-5 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </Button>
+                    <span className="text-sm text-neutral-500">
+                      {carouselIndex + 1} / {generatedActivities.length}
+                    </span>
+                    <Button
+                      onClick={handleNext}
+                      variant="outline"
+                      size="icon"
+                      className="rounded-full bg-neutral-200 p-2 hover:bg-neutral-300"
+                      aria-label="Next"
+                    >
+                      <svg className="h-5 w-5 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : fetchedActivities && fetchedActivities.activities && fetchedActivities.activities.length > 0 ? (
+              <div className="bg-muted rounded-xl">
+                <h4 className="text-foreground px-4 py-2 flex items-center text-lg font-medium">
+                  <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    />
+                  </svg>
+                  Saved Activities
+                </h4>
+                <div className="relative w-full p-2">
+                  <div className="mb-6 min-h-[180px] rounded-2xl bg-white/90 p-4 shadow-lg">
+                    <h4 className="mb-4 text-xl font-semibold text-neutral-800">
+                      {fetchedActivities.activities[carouselIndex]?.name}
+                    </h4>
+                    <div className="space-y-4">
+                      {fetchedActivities.activities[carouselIndex]?.purpose && (
+                        <div>
+                          <h5 className="mb-2 text-sm font-semibold text-neutral-700">Purpose</h5>
+                          <p className="text-sm leading-relaxed text-neutral-600">
+                            {fetchedActivities.activities[carouselIndex].purpose}
+                          </p>
+                        </div>
+                      )}
+                      {fetchedActivities.activities[carouselIndex]?.materials_required &&
+                        fetchedActivities.activities[carouselIndex].materials_required.length > 0 && (
+                          <div>
+                            <h5 className="mb-2 text-sm font-semibold text-neutral-700">Materials Required</h5>
+                            <p className="text-sm leading-relaxed text-neutral-600">
+                              {fetchedActivities.activities[carouselIndex].materials_required.join(', ')}
+                            </p>
+                          </div>
+                        )}
+                      <div>
+                        <h5 className="mb-2 text-sm font-semibold text-neutral-700">Instructions</h5>
+                        <p className="text-sm leading-relaxed text-neutral-600">
+                          {fetchedActivities.activities[carouselIndex]?.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Carousel Navigation */}
+                  <div className="flex w-full items-center justify-between px-4">
+                    <Button
+                      onClick={handlePrevious}
+                      variant="outline"
+                      size="icon"
+                      className="rounded-full bg-neutral-200 p-2 hover:bg-neutral-300"
+                      aria-label="Previous"
+                    >
+                      <svg className="h-5 w-5 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </Button>
+                    <span className="text-sm text-neutral-500">
+                      {carouselIndex + 1} / {fetchedActivities.activities.length}
+                    </span>
+                    <Button
+                      onClick={handleNext}
+                      variant="outline"
+                      size="icon"
+                      className="rounded-full bg-neutral-200 p-2 hover:bg-neutral-300"
+                      aria-label="Next"
+                    >
+                      <svg className="h-5 w-5 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-muted rounded-xl p-4">
+                <div className="text-foreground scrollbar-thin scrollbar-thumb-secondary scrollbar-track-muted max-h-64 overflow-y-auto pr-2 text-sm leading-relaxed">
+                  <p>Activities will be generated based on the selected mode and modalities.</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="mb-4 w-full rounded-xl bg-red-100 p-4 text-center text-red-700 shadow">{error}</div>
           )}
+
+          {/* Progress Display */}
+          {isGenerating && progress && (
+            <div className="bg-muted mb-4 flex items-center gap-2 rounded-lg p-3">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">{progress}</span>
+            </div>
+          )}
+
+          {/* Input Area */}
+          <div className="space-y-4">
+            <div className="relative">
+              <textarea
+                value={teacher_requirements}
+                onChange={e => {
+                  setTeacherRequirements(e.target.value.trim())
+                }}
+                placeholder="Type your activity request or customization here..."
+                rows={3}
+                className="border-border focus:border-secondary text-foreground w-full resize-none rounded-2xl border-2 p-4 pr-12 transition-colors duration-200 focus:ring-0 focus:outline-none"
+                disabled={isGenerating}
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-1">
+              <Button
+                onClick={handleGenerateActivities}
+                variant="secondary"
+                className="flex-1 rounded-3xl px-6 py-4 font-medium transition-all duration-300"
+                disabled={isGenerating || !modes_of_interaction || !modalities?.length}
+              >
+                <span className="flex items-center justify-center">
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-5 w-5" />
+                      Generate Activities
+                    </>
+                  )}
+                </span>
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={handleSaveToDatabase}
+                className="rounded-3xl px-6 py-4"
+                disabled={saveActivitiesMutation.isPending || !generatedActivities.length}
+              >
+                {saveActivitiesMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-5 w-5" />
+                    Save
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
       <AIHelpDialog />

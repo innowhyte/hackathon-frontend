@@ -12,6 +12,7 @@ import Header from '../components/header'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
 import { useLatestClassroom } from '../queries/classroom-queries'
 import { useCreateTopic } from '../mutations/topic-mutations'
+import { useCreateWeeklyPlan } from '../mutations/topic-mutations'
 import { toast } from 'sonner'
 
 export default function TopicSetup() {
@@ -46,6 +47,7 @@ export default function TopicSetup() {
   // Topic creation state
   const [topicCreatedId, setTopicCreatedId] = React.useState<number | null>(null)
   const { mutate: createTopic, isPending: isCreatingTopic } = useCreateTopic()
+  const { mutate: createWeeklyPlan, isPending: isCreatingWeeklyPlan } = useCreateWeeklyPlan()
 
   const handleCreateTopic = () => {
     if (!topic.trim()) return
@@ -67,10 +69,6 @@ export default function TopicSetup() {
         },
       },
     )
-  }
-
-  const handleContinue = () => {
-    navigate('/weekly-plan')
   }
 
   const handleLearningOutcomeChange = (gradeName: string, value: string) => {
@@ -121,6 +119,18 @@ export default function TopicSetup() {
   const canContinueFromTopicSetup = () => {
     if (!topic.trim()) return false
     return selectedGrades.every(g => learningOutcomes[g.name] && learningOutcomes[g.name].trim())
+  }
+
+  const handleCreateWeeklyPlan = () => {
+    if (!topicCreatedId) return
+    createWeeklyPlan(topicCreatedId, {
+      onSuccess: () => {
+        navigate(`/weekly-plan?topicId=${topicCreatedId}`)
+      },
+      onError: () => {
+        toast.error('Failed to create weekly plan.')
+      },
+    })
   }
 
   if (isLoading) {
@@ -317,13 +327,22 @@ export default function TopicSetup() {
 
           <div className="mx-auto mt-6 flex w-full max-w-md items-center justify-center gap-3">
             <Button
-              onClick={handleContinue}
+              onClick={handleCreateWeeklyPlan}
               size="lg"
               className="flex-1 rounded-xl px-4 py-3 text-base font-medium shadow-md transition-all duration-300 hover:shadow-lg"
-              disabled={!canContinueFromTopicSetup()}
+              disabled={!topicCreatedId || isCreatingWeeklyPlan}
             >
-              <Sparkles className="h-5 w-5" />
-              Create Weekly Lesson Plan
+              {isCreatingWeeklyPlan ? (
+                <>
+                  <Sparkles className="h-5 w-5 animate-spin" />
+                  Generating Weekly Plan...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-5 w-5" />
+                  Create Weekly Lesson Plan
+                </>
+              )}
             </Button>
           </div>
         </div>

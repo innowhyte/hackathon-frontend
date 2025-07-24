@@ -7,18 +7,17 @@ import TopicSetup from './pages/topic-setup'
 import WeeklyPlan from './pages/weekly-plan'
 import DayLesson from './pages/day-lesson'
 import StudentManagement from './pages/student-management'
-import TopicAssessment from './pages/topic-assessment'
-import ConductAssessment from './pages/conduct-assessment'
-import AssessmentOverview from './pages/assessment-overview'
+import Assessments from './pages/assessments'
 import StudentAssessment from './pages/student-assessment'
 import GradeActivities from './pages/grade-activities'
-import WholeClassActivities from './pages/whole-class-activities'
-import Activities from './pages/activities-page'
+import WholeClassMaterials from './pages/whole-class-materials'
 import NotFound from './pages/not-found'
 import './index.css'
 import { Toaster } from '@/components/ui/sonner'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import AssessmentDetails from './pages/assessment-details'
+import StudentDetails from './pages/student-details'
 
 const router = createBrowserRouter([
   {
@@ -43,32 +42,32 @@ const router = createBrowserRouter([
     element: <StudentManagement />,
   },
   {
-    path: '/assessment',
-    element: <TopicAssessment />,
+    path: '/grade/:grade/students/:id',
+    element: <StudentDetails />,
   },
   {
-    path: '/assessment/:assessmentId/conduct/grade/:grade',
-    element: <AssessmentOverview />,
+    path: '/assessments',
+    element: <Assessments />,
   },
   {
-    path: '/assessment/:assessmentId/student/:studentId',
+    path: '/grade/:grade/assessment/:assessmentId',
+    element: <AssessmentDetails />,
+  },
+  {
+    path: '/grade/:grade/assessment/:assessmentId/conduct',
+    element: <AssessmentDetails />,
+  },
+  {
+    path: '/grade/:grade/assessment/:assessmentId/student/:studentId',
     element: <StudentAssessment />,
   },
   {
-    path: '/assessment/:assessmentId/:grade',
-    element: <ConductAssessment />,
-  },
-  {
-    path: '/day/:day/activities',
-    element: <WholeClassActivities />,
-  },
-  {
-    path: '/day/:day/grade/:gradeId/generate-activities',
-    element: <GradeActivities />,
+    path: '/day/:day/materials',
+    element: <WholeClassMaterials />,
   },
   {
     path: '/day/:day/grade/:gradeId/activities',
-    element: <Activities />,
+    element: <GradeActivities />,
   },
 ])
 

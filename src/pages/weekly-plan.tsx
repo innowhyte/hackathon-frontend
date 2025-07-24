@@ -7,7 +7,6 @@ import AIHelpDialog from '../components/modals/ai-help-dialog'
 import TopicSelector from '../components/topic-selector'
 import { useAllTopics } from '../queries/topic-queries'
 import EmptyWeeklyPlan from '@/components/empty-weekly-plan'
-import { data } from '@/lib/data'
 import { useSearchParams } from 'react-router'
 import Loading from '@/components/loading'
 
@@ -21,7 +20,7 @@ export default function WeeklyPlan() {
 
   // Get lesson plan from selected topic
   const selectedTopic = topics?.find(t => t.id === topicId)
-  const lessonPlan = data[selectedTopic?.name as keyof typeof data]?.outputs || {}
+  const lessonPlan = selectedTopic?.weekly_plan || {}
   useTitle(`Weekly Plan ${selectedTopic?.name ? `| ${selectedTopic?.name}` : ' | Select a Topic'}`)
 
   if (isLoadingTopics) {

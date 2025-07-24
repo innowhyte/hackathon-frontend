@@ -7,7 +7,7 @@ export interface Story {
 }
 
 const fetchStoryByDayAndTopic = async (day_id: string, topic_id: string): Promise<Story | null> => {
-  const response = await fetch(`${API_BASE_URL}/api/day/${day_id}/topic/${topic_id}/story`)
+  const response = await fetch(`${API_BASE_URL}/api/day/${day_id}/topic/${topic_id}/class-materials/story`)
   if (!response.ok) {
     if (response.status === 404) return null
     throw new Error('Failed to fetch story')

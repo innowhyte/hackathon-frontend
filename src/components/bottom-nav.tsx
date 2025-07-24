@@ -52,9 +52,9 @@ export default function BottomNav() {
           <span className="text-xs font-medium">Weekly Plan</span>
         </button>
         <button
-          onClick={() => handleNavigation('/assessment')}
+          onClick={() => handleNavigation('/assessments')}
           className={`flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
-            isActive('/assessment') ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
+            isActive('/assessments') ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
           }`}
         >
           <svg className="mb-1 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

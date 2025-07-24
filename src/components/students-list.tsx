@@ -144,6 +144,7 @@ export default function StudentsList({
                 onOpenEdit={onOpenEdit}
                 onRemove={onRemoveStudent}
                 isRemoving={isRemoving}
+                gradeId={selectedGrade.id}
               />
             ))}
           </div>

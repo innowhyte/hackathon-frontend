@@ -15,7 +15,7 @@ import { useAllTopics } from '../queries/topic-queries'
 import { data } from '../lib/data'
 import Loading from '@/components/loading'
 
-export default function WholeClassActivities() {
+export default function WholeClassMaterials() {
   const { day } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const topicIdParam = searchParams.get('topicId')

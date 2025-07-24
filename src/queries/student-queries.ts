@@ -24,6 +24,17 @@ const fetchAllStudents = async (): Promise<Student[]> => {
   return response.json()
 }
 
+// New: Fetch student by ID
+const fetchStudentById = async (studentId: number): Promise<Student> => {
+  const response = await fetch(`${API_BASE_URL}/api/students/${studentId}`)
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch student')
+  }
+
+  return response.json()
+}
+
 // Queries
 export const useStudentsByGrade = (gradeId: number | null) => {
   return useQuery({
@@ -39,6 +50,17 @@ export const useAllStudents = () => {
   return useQuery({
     queryKey: ['students'],
     queryFn: fetchAllStudents,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  })
+}
+
+// New: Hook to fetch student by ID
+export const useStudentById = (studentId: number | null) => {
+  return useQuery({
+    queryKey: ['student', studentId],
+    queryFn: () => fetchStudentById(studentId!),
+    enabled: !!studentId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   })
@@ -124,4 +146,23 @@ export const useStudentsWithFeedback = (gradeId: number | null) => {
 // Utility function to get feedback count for a student
 export const getFeedbackCount = (studentId: number, feedbackData: Record<number, Feedback[]>): number => {
   return feedbackData[studentId]?.length || 0
+}
+
+// Student Report API
+const fetchStudentReport = async (studentId: number) => {
+  const response = await fetch(`${API_BASE_URL}/api/students/${studentId}/report`)
+  if (!response.ok) {
+    throw new Error('Failed to fetch student report')
+  }
+  return response.json()
+}
+
+export const useStudentReport = (studentId: number | null) => {
+  return useQuery({
+    queryKey: ['studentReport', studentId],
+    queryFn: () => fetchStudentReport(studentId!),
+    enabled: !!studentId,
+    staleTime: 0,
+    gcTime: 5 * 60 * 1000,
+  })
 }

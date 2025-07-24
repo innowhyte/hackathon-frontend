@@ -5,6 +5,7 @@ export interface Student {
   id: number
   name: string
   grade_id: number
+  grade_name?: string // Added to match API response
 }
 
 export interface CreateStudentRequest {
@@ -61,6 +62,22 @@ const deleteStudent = async (studentId: number): Promise<void> => {
   if (!response.ok) {
     throw new Error('Failed to delete student')
   }
+}
+
+// Generate Report API
+const generateStudentReport = async (studentId: number): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/api/students/${studentId}/report`, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to generate student report')
+  }
+
+  return response.json()
 }
 
 // Feedback API
@@ -134,6 +151,20 @@ export const useDeleteStudent = () => {
       // Invalidate all students queries since we don't know which grade the student belonged to
       queryClient.invalidateQueries({
         queryKey: ['students'],
+      })
+    },
+  })
+}
+
+export const useGenerateStudentReport = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: generateStudentReport,
+    onSuccess: (_data, studentId) => {
+      // Invalidate the student report query to refetch the new report
+      queryClient.invalidateQueries({
+        queryKey: ['studentReport', studentId],
       })
     },
   })

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router'
 import { useStudentsWithFeedback, getFeedbackCount } from '../queries/student-queries'
@@ -20,7 +20,7 @@ interface Grade {
   name: string
 }
 
-export const useStudentManagement = () => {
+export const useStudentManagement = (initialGradeId?: number) => {
   const navigate = useNavigate()
 
   // Grade selection state
@@ -37,6 +37,17 @@ export const useStudentManagement = () => {
 
   // API queries and mutations
   const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
+
+  // Initialize selected grade when classroom data is loaded and initial grade ID is provided
+  useEffect(() => {
+    if (latestClassroom && initialGradeId && !selectedGrade) {
+      const grade = latestClassroom.grades.find(g => g.id === initialGradeId)
+      if (grade) {
+        setSelectedGrade({ id: grade.id, name: grade.name })
+      }
+    }
+  }, [latestClassroom, initialGradeId, selectedGrade])
+
   const {
     students,
     feedback,

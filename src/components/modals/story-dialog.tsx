@@ -23,7 +23,7 @@ const StoryDialog = ({
   latestClassroom: Classroom
 }) => {
   // Story generation hook
-  const { isGenerating, progress, error, generateStory, cancelGeneration, reset } = useStoryGeneration()
+  const { isGenerating, progress, error, idea, generateStory, cancelGeneration, reset } = useStoryGeneration()
 
   // Story query and mutation
   const { data: fetchedStory, isLoading: isStoryLoading } = useStoryByDayAndTopic(day_id, topic_id)
@@ -72,7 +72,7 @@ const StoryDialog = ({
   const handleSaveToDatabase = () => {
     if (!generatedStory) return
     saveStoryMutation.mutate(
-      { day_id, topic_id, story: generatedStory },
+      { day_id, topic_id, story: generatedStory, idea },
       {
         onSuccess: () => {
           toast.success('Story saved!')

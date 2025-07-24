@@ -6,6 +6,7 @@ export interface StoryGenerationState {
   isGenerating: boolean
   progress: string
   story: string
+  idea: string
   error: string | null
 }
 
@@ -26,6 +27,7 @@ export const useStoryGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState('')
   const [story, setStory] = useState('')
+  const [idea, setIdea] = useState('')
   const [error, setError] = useState<string | null>(null)
   const abortController = new AbortController()
 
@@ -40,9 +42,10 @@ export const useStoryGeneration = () => {
     setIsGenerating(true)
     setProgress('')
     setStory('')
+    setIdea('')
     setError(null)
 
-    await fetchEventSource(`${API_BASE_URL}/api/day/${day_id}/topic/${topic_id}/generate-story`, {
+    await fetchEventSource(`${API_BASE_URL}/api/day/${day_id}/topic/${topic_id}/class-materials/story`, {
       signal: abortController.signal,
       openWhenHidden: true,
       method: 'POST',
@@ -62,6 +65,11 @@ export const useStoryGeneration = () => {
             const progressMessage = data
             setProgress(progressMessage)
             onProgress?.(progressMessage)
+            break
+
+          case 'idea':
+            const ideaData = data
+            setIdea(ideaData)
             break
 
           case 'data':
@@ -121,6 +129,7 @@ export const useStoryGeneration = () => {
     setIsGenerating(false)
     setProgress('')
     setStory('')
+    setIdea('')
     setError(null)
   }, [])
 
@@ -128,6 +137,7 @@ export const useStoryGeneration = () => {
     isGenerating,
     progress,
     story,
+    idea,
     error,
     generateStory,
     cancelGeneration,

@@ -1,5 +1,6 @@
 import { useTitle } from '../hooks/use-title'
 import { useStudentManagement } from '../hooks/use-student-management'
+import { useSearchParams } from 'react-router'
 
 import BottomNav from '../components/bottom-nav'
 import Header from '../components/header'
@@ -12,6 +13,10 @@ import StudentsList from '../components/students-list'
 import EmptyGradeState from '../components/empty-grade-state'
 
 export default function StudentManagement() {
+  const [searchParams] = useSearchParams()
+  const gradeId = searchParams.get('grade')
+  const initialGradeId = gradeId ? Number(gradeId) : undefined
+
   const {
     selectedGrade,
     showAddStudentModal,
@@ -41,7 +46,7 @@ export default function StudentManagement() {
     setShowFeedbackModal,
     getStudentFeedback,
     navigate,
-  } = useStudentManagement()
+  } = useStudentManagement(initialGradeId)
 
   useTitle(`${selectedGrade?.name ? `${selectedGrade.name} | ` : ''} Student Management`)
 
