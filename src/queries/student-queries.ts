@@ -15,7 +15,7 @@ const fetchStudentsByGrade = async (gradeId: number): Promise<Student[]> => {
 }
 
 const fetchAllStudents = async (): Promise<Student[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/students/`)
+  const response = await fetch(`${API_BASE_URL}/api/students`)
 
   if (!response.ok) {
     throw new Error('Failed to fetch students')

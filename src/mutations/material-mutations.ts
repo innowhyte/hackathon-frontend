@@ -21,7 +21,7 @@ const addMaterial = async ({ topicId, file, link }: { topicId: number; file?: Fi
     formData.append('link', link)
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/topics/${topicId}/teaching-materials/`, {
+  const response = await fetch(`${API_BASE_URL}/api/topics/${topicId}/teaching-materials`, {
     method: 'POST',
     body: formData,
   })

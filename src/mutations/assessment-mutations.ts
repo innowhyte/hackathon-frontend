@@ -28,7 +28,7 @@ export interface Assessment {
 }
 
 const generateAssessment = async (data: GenerateAssessmentInput): Promise<Assessment> => {
-  const response = await fetch(`${API_BASE_URL}/api/topics/${data.topic_id}/grades/${data.grade_id}/assessments/`, {
+  const response = await fetch(`${API_BASE_URL}/api/topics/${data.topic_id}/grades/${data.grade_id}/assessments`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

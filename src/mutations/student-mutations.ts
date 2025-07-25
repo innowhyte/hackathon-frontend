@@ -23,7 +23,7 @@ export interface UpdateStudentRequest {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const createStudent = async (data: CreateStudentRequest): Promise<Student> => {
-  const response = await fetch(`${API_BASE_URL}/api/students/`, {
+  const response = await fetch(`${API_BASE_URL}/api/students`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ const createStudent = async (data: CreateStudentRequest): Promise<Student> => {
 }
 
 const updateStudent = async (data: UpdateStudentRequest): Promise<Student> => {
-  const response = await fetch(`${API_BASE_URL}/api/students/${data.id}/`, {
+  const response = await fetch(`${API_BASE_URL}/api/students/${data.id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ const updateStudent = async (data: UpdateStudentRequest): Promise<Student> => {
 }
 
 const deleteStudent = async (studentId: number): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/api/students/${studentId}/`, {
+  const response = await fetch(`${API_BASE_URL}/api/students/${studentId}`, {
     method: 'DELETE',
   })
 

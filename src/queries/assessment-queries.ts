@@ -37,7 +37,7 @@ export interface Assessment {
 }
 
 const fetchAssessmentsByTopicGrade = async (topic_id: string, grade_id: string): Promise<Assessment[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/topics/${topic_id}/grades/${grade_id}/assessments/`)
+  const response = await fetch(`${API_BASE_URL}/api/topics/${topic_id}/grades/${grade_id}/assessments`)
 
   if (response.status === 404) {
     return []
