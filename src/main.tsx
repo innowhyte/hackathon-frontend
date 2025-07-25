@@ -1,9 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AppContextProvider } from './context/app-context'
 import GradeSelection from './pages/grade-selection'
-import TopicSetup from './pages/topic-setup'
+import Topics from './pages/topics'
 import WeeklyPlan from './pages/weekly-plan'
 import DayLesson from './pages/day-lesson'
 import StudentManagement from './pages/student-management'
@@ -14,8 +16,6 @@ import WholeClassMaterials from './pages/whole-class-materials'
 import NotFound from './pages/not-found'
 import './index.css'
 import { Toaster } from '@/components/ui/sonner'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import AssessmentDetails from './pages/assessment-details'
 import StudentDetails from './pages/student-details'
 
@@ -26,8 +26,8 @@ const router = createBrowserRouter([
     errorElement: <NotFound />,
   },
   {
-    path: '/create-topic',
-    element: <TopicSetup />,
+    path: '/topics',
+    element: <Topics />,
   },
   {
     path: '/weekly-plan',

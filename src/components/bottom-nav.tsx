@@ -21,13 +21,11 @@ export default function BottomNav() {
   return (
     <nav className="border-border shadow-elevation-3 bg-background/95 fixed bottom-0 left-0 z-50 w-full border-t-2 backdrop-blur-md">
       <div className="mx-auto flex max-w-2xl items-center justify-around py-2">
-        <NavLink
-          to="/create-topic"
-          className={({ isActive }) =>
-            `flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
-              isActive ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
-            }`
-          }
+        <button
+          onClick={() => handleNavigation('/topics')}
+          className={`flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${
+            isActive('/topics') ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-muted'
+          }`}
         >
           <svg className="mb-1 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -37,8 +35,8 @@ export default function BottomNav() {
               d="M12 2a7 7 0 0 0-7 7c0 2.386 1.053 4.507 2.75 5.905A2.996 2.996 0 0 0 10 18h4a2.996 2.996 0 0 0 2.25-3.095C17.947 13.507 19 11.386 19 9a7 7 0 0 0-7-7zm0 18v2m-4 0h8"
             />
           </svg>
-          <span className="text-xs font-medium">Topic</span>
-        </NavLink>
+          <span className="text-xs font-medium">Topics</span>
+        </button>
         <button
           onClick={() => handleNavigation('/weekly-plan')}
           className={`flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300 ${

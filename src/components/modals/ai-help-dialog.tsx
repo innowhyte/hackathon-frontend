@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { useAIHelpAnswer } from '@/hooks/use-ai-help-answer'
+import { Loader2 } from 'lucide-react'
 
 const AIHelpDialog = ({
   showAIHelpDialog,
@@ -67,6 +68,14 @@ const AIHelpDialog = ({
               />
             </div>
           </div>
+          {/* Progress Display */}
+          {isGenerating && progress && (
+            <div className="bg-muted mb-4 flex items-center gap-2 rounded-lg p-3">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">{progress}</span>
+            </div>
+          )}
+
           <Button
             onClick={handleAIHelpSubmit}
             variant="secondary"
@@ -85,14 +94,6 @@ const AIHelpDialog = ({
               {isGenerating ? 'Generating...' : 'Submit'}
             </span>
           </Button>
-          {isGenerating && (
-            <div className="text-muted-foreground mt-4 text-sm">
-              {progress || 'Generating answer...'}
-              <Button variant="ghost" className="ml-4 h-6 px-2 py-0 text-xs" onClick={cancelGeneration}>
-                Cancel
-              </Button>
-            </div>
-          )}
           {answer && (
             <div className="bg-muted border-secondary mt-6 rounded-2xl border-l-4 p-4">
               <h4 className="text-foreground mb-3 flex items-center text-lg font-medium">

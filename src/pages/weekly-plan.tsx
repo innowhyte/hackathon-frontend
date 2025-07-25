@@ -67,7 +67,7 @@ export default function WeeklyPlan() {
     <div className="bg-background min-h-screen pb-20">
       <Header
         title="Weekly Lesson Plan"
-        onBack={() => navigate('/create-topic')}
+        onBack={() => navigate('/topics')}
         showAIHelp={!!topicId}
         onShowAIHelp={() => setShowAIHelpDialog(true)}
       />
