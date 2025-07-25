@@ -23,7 +23,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const createOrUpdateClassroom = async (data: CreateOrUpdateClassroomRequest): Promise<Classroom> => {
   const { id, ...rest } = data
-  const url = id ? `${API_BASE_URL}/api/classrooms/${id}/` : `${API_BASE_URL}/api/classrooms/`
+  const url = id ? `${API_BASE_URL}/api/classrooms/${id}` : `${API_BASE_URL}/api/classrooms`
   const method = id ? 'PUT' : 'POST'
   const response = await fetch(url, {
     method,

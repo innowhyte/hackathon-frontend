@@ -16,7 +16,7 @@ export interface Classroom {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const fetchLatestClassroom = async (): Promise<Classroom | null> => {
-  const response = await fetch(`${API_BASE_URL}/api/classrooms/`)
+  const response = await fetch(`${API_BASE_URL}/api/classrooms`)
   if (!response.ok) {
     throw new Error('Failed to fetch classrooms')
   }
