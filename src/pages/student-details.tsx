@@ -292,12 +292,7 @@ export default function StudentDetails() {
                 <User size={24} className="mr-2" />
                 Student Profile
               </h1>
-              {report ? (
-                <p className="text-primary-foreground/90 text-lg">
-                  {report.studentInfo?.name || `Student ID: ${id}`} | Grade:{' '}
-                  {grade?.replace('grade_', '') || report.studentInfo?.grade?.replace('grade_', '')}
-                </p>
-              ) : student ? (
+              {student ? (
                 <p className="text-primary-foreground/90 text-lg">
                   {student.name} | {student.grade_name || student.grade_id}
                 </p>
