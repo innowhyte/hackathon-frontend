@@ -159,6 +159,6 @@ export const useStudentReport = (studentId: number | null) => {
   return useQuery({
     queryKey: ['studentReport', studentId],
     queryFn: () => fetchStudentReport(studentId!),
-    enabled: !!studentId,
+    enabled: !!studentId, // Only run query if studentId is provided
   })
 }

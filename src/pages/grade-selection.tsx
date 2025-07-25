@@ -5,6 +5,7 @@ import { useCreateOrUpdateClassroom } from '../mutations/classroom-mutations'
 import { useLatestClassroom } from '../queries/classroom-queries'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
+import Loading from '@/components/loading'
 
 export default function GradeSelection() {
   useTitle('Grade Selection')
@@ -101,7 +102,7 @@ export default function GradeSelection() {
   }
 
   if (isLoadingClassroom) {
-    return <div>Loading previous selection...</div>
+    return <Loading message="Loading the classroom..." />
   }
 
   return (

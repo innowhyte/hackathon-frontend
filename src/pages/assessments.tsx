@@ -1,7 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router'
 import { useTitle } from '../hooks/use-title'
-import { useContext, useState } from 'react'
-import { AppContext } from '../context/app-context'
+import { useEffect, useState } from 'react'
 import BottomNav from '../components/bottom-nav'
 import Header from '../components/header'
 import { Button } from '../components/ui/button'
@@ -34,8 +33,9 @@ export default function TopicAssessment() {
     passage_reading: { numberOfWords: 100, difficultyLevel: 'medium' as const },
     passage_completion: { projectType: 'poster' as const },
   })
+  const [showAIHelpDialog, setShowAIHelpDialog] = useState(false)
+  const [threadId, setThreadId] = useState<string | null>(null)
 
-  const context = useContext(AppContext)
   const navigate = useNavigate()
   const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
   const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
@@ -49,9 +49,17 @@ export default function TopicAssessment() {
   // Get selected topic
   const selectedTopic = topics?.find(t => t.id === topicId)
 
+  useEffect(() => {
+    if (topicId) {
+      setThreadId(crypto.randomUUID())
+    } else {
+      setThreadId(null)
+    }
+  }, [topicId])
+
   useTitle(`Topic Assessment ${selectedTopic?.name ? `| ${selectedTopic?.name}` : ' | Select a Topic'}`)
 
-  if (!context || isLoadingClassroom || isLoadingTopics) {
+  if (isLoadingClassroom || isLoadingTopics) {
     return <Loading message="Loading..." />
   }
 
@@ -92,6 +100,8 @@ export default function TopicAssessment() {
             navigate('/weekly-plan')
           }
         }}
+        showAIHelp={!!topicId}
+        onShowAIHelp={() => setShowAIHelpDialog(true)}
       />
 
       <div className="p-4">
@@ -277,7 +287,12 @@ export default function TopicAssessment() {
         </div>
       </div>
 
-      <AIHelpDialog />
+      <AIHelpDialog
+        showAIHelpDialog={showAIHelpDialog}
+        setShowAIHelpDialog={setShowAIHelpDialog}
+        topicId={topicId?.toString() || ''}
+        threadId={threadId || ''}
+      />
       <BottomNav />
     </div>
   )

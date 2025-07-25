@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { AppContextProvider } from './context/app-context'
+// import { AppContextProvider } from './context/app-context'
 import GradeSelection from './pages/grade-selection'
 import Topics from './pages/topics'
 import WeeklyPlan from './pages/weekly-plan'
@@ -82,10 +82,10 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AppContextProvider>
-        <RouterProvider router={router} />
-        <Toaster />
-      </AppContextProvider>
+      {/* <AppContextProvider> */}
+      <RouterProvider router={router} />
+      <Toaster />
+      {/* </AppContextProvider> */}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </React.StrictMode>,

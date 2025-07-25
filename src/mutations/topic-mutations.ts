@@ -21,7 +21,7 @@ export interface Topic {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const createTopic = async (data: CreateTopicInput): Promise<Topic> => {
-  const response = await fetch(`${API_BASE_URL}/api/topics`, {
+  const response = await fetch(`${API_BASE_URL}/api/topics/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
