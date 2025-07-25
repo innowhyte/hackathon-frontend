@@ -101,6 +101,17 @@ const postStudentFeedback = async ({ studentId, feedback }: { studentId: number;
   return response.json()
 }
 
+const deleteStudentFeedback = async ({ studentId, feedbackId }: { studentId: number; feedbackId: string }) => {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+  const response = await fetch(`${API_BASE_URL}/api/students/${studentId}/feedback/${feedbackId}`, {
+    method: 'DELETE',
+  })
+  if (!response.ok) {
+    throw new Error('Failed to delete feedback')
+  }
+  return response.json()
+}
+
 // Mutations
 export const useCreateStudent = () => {
   const queryClient = useQueryClient()
@@ -189,6 +200,24 @@ export const usePostStudentFeedback = () => {
       // Also invalidate students queries to refresh the combined data
       queryClient.invalidateQueries({
         queryKey: ['students'],
+        exact: false,
+      })
+    },
+  })
+}
+
+export const useDeleteStudentFeedback = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: deleteStudentFeedback,
+    onSuccess: (_data, variables) => {
+      // Invalidate individual student feedback query
+      queryClient.invalidateQueries({
+        queryKey: ['studentFeedback', variables.studentId],
+      })
+      // Invalidate all students feedback queries (with any studentIds array)
+      queryClient.invalidateQueries({
+        queryKey: ['allStudentsFeedback'],
         exact: false,
       })
     },

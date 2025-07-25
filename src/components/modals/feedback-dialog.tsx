@@ -5,6 +5,7 @@ import { Textarea } from '../ui/textarea'
 import { ClockIcon, Trash2Icon } from 'lucide-react'
 
 interface Feedback {
+  id: string
   text: string
   date: string
 }
@@ -15,7 +16,7 @@ interface FeedbackDialogProps {
   selectedStudent: { id: number; name: string } | null
   studentFeedback: Feedback[]
   onSaveFeedback: (studentId: number, feedback: Feedback) => void
-  onDeleteFeedback: (studentId: number) => void // No feedbackId
+  onDeleteFeedback: (studentId: number, feedbackId: string) => void
 }
 
 const FeedbackDialog = ({
@@ -31,17 +32,12 @@ const FeedbackDialog = ({
   const handleSaveFeedback = () => {
     if (selectedStudent && feedbackText.trim()) {
       const newFeedback: Feedback = {
+        id: crypto.randomUUID(),
         text: feedbackText.trim(),
         date: new Date().toISOString(),
       }
       onSaveFeedback(selectedStudent.id, newFeedback)
       setFeedbackText('')
-    }
-  }
-
-  const handleDeleteFeedback = () => {
-    if (selectedStudent) {
-      onDeleteFeedback(selectedStudent.id)
     }
   }
 
@@ -66,7 +62,7 @@ const FeedbackDialog = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 p-6">
+        <div className="space-y-6 p-0">
           {/* Previous Feedback Section */}
           {studentFeedback.length > 0 && (
             <div className="space-y-3">
@@ -75,9 +71,9 @@ const FeedbackDialog = ({
                 <h3 className="text-foreground text-sm font-medium">Previous Feedback ({studentFeedback.length})</h3>
               </div>
               <div className="max-h-48 space-y-2 overflow-y-auto">
-                {studentFeedback.map((feedback: Feedback, idx: number) => (
+                {studentFeedback.map((feedback: Feedback) => (
                   <div
-                    key={idx}
+                    key={feedback.id}
                     className="bg-muted/50 border-border flex items-start justify-between rounded-lg border p-3"
                   >
                     <div className="flex-1 pr-3">
@@ -92,7 +88,15 @@ const FeedbackDialog = ({
                         })}
                       </p>
                     </div>
-                    {/* Optionally keep delete button, but it will not work unless API supports it */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:bg-destructive/10 ml-2"
+                      onClick={() => selectedStudent && onDeleteFeedback(selectedStudent.id, feedback.id)}
+                      aria-label="Delete feedback"
+                    >
+                      <Trash2Icon className="h-4 w-4" />
+                    </Button>
                   </div>
                 ))}
               </div>

@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { useAIHelpAnswer } from '@/hooks/use-ai-help-answer'
 import { Loader2 } from 'lucide-react'
+import { MarkdownContent } from '../markdown'
 
 const AIHelpDialog = ({
   showAIHelpDialog,
@@ -16,7 +17,7 @@ const AIHelpDialog = ({
   threadId?: string
 }) => {
   const [aiHelpPrompt, setAiHelpPrompt] = useState('')
-  const { isGenerating, progress, answer, error, generateAnswer, reset, cancelGeneration } = useAIHelpAnswer()
+  const { isGenerating, progress, answer, error, generateAnswer, reset } = useAIHelpAnswer()
 
   const handleAIHelpSubmit = () => {
     if (aiHelpPrompt.trim()) {
@@ -107,8 +108,8 @@ const AIHelpDialog = ({
                 </svg>
                 Assistant Response
               </h4>
-              <div className="text-foreground scrollbar-thin scrollbar-thumb-secondary scrollbar-track-muted max-h-64 overflow-y-auto pr-2 text-sm leading-relaxed whitespace-pre-line">
-                {answer}
+              <div className="text-foreground scrollbar-thin scrollbar-thumb-secondary scrollbar-track-muted max-h-64 overflow-y-auto px-4 text-sm leading-relaxed whitespace-pre-line">
+                <MarkdownContent id={crypto.randomUUID()} content={answer} />
               </div>
             </div>
           )}

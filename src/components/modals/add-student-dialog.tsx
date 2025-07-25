@@ -45,7 +45,7 @@ const AddStudentDialog = ({ open, onOpenChange, onAdd }: AddStudentDialogProps) 
           </div>
         </DialogHeader>
 
-        <div className="space-y-6 p-6">
+        <div className="space-y-6 p-0">
           <div className="space-y-2">
             <label className="text-foreground text-sm font-medium">Student Name</label>
             <Input

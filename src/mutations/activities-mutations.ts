@@ -13,7 +13,7 @@ export interface SaveActivitiesInput {
 }
 
 const saveActivities = async (data: SaveActivitiesInput): Promise<void> => {
-  const activities = data.activities.map((activity) => ({
+  const activities = data.activities.map(activity => ({
     ...activity,
     modes_of_interaction: data.modes_of_interaction,
     modalities: data.modalities,

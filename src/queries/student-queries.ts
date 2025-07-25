@@ -62,6 +62,7 @@ export const useStudentById = (studentId: number | null) => {
 
 // Feedback API
 export interface Feedback {
+  id: string
   text: string
   date: string
 }
@@ -72,7 +73,12 @@ const fetchStudentFeedback = async (studentId: number): Promise<Feedback[]> => {
     throw new Error('Failed to fetch feedback')
   }
   const data = await response.json()
-  return data.feedback || []
+  // Ensure each feedback has an id as string
+  return (data.feedback || []).map((f: any) => ({
+    id: String(f.id),
+    text: f.text,
+    date: f.date,
+  }))
 }
 
 // New: Fetch feedback for all students in a grade

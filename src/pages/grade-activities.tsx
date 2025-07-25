@@ -326,15 +326,21 @@ export default function GradeActivities() {
                     <div className="flex items-center gap-2">
                       {fetchedActivities.activities[carouselIndex]?.modes_of_interaction && (
                         <Badge variant="secondary" className="bg-primary text-secondaryn">
-                          {modeOfInteractionOptions.find(option => option.id === fetchedActivities.activities[carouselIndex].modes_of_interaction)?.label}
+                          {
+                            modeOfInteractionOptions.find(
+                              option => option.id === fetchedActivities.activities[carouselIndex].modes_of_interaction,
+                            )?.label
+                          }
                         </Badge>
                       )}
                       {fetchedActivities.activities[carouselIndex]?.modalities &&
-                        fetchedActivities.activities[carouselIndex]?.modalities.map((modality: string, index: number) => (
-                          <Badge key={index} variant="secondary" className="bg-secondary text-primary">
-                            {modalityOptions.find(option => option.id === modality)?.label}
-                          </Badge>
-                        ))}
+                        fetchedActivities.activities[carouselIndex]?.modalities.map(
+                          (modality: string, index: number) => (
+                            <Badge key={index} variant="secondary" className="bg-secondary text-primary">
+                              {modalityOptions.find(option => option.id === modality)?.label}
+                            </Badge>
+                          ),
+                        )}
                     </div>
                   </div>
                   <div className="mb-6 min-h-[180px] rounded-2xl bg-white/90 p-4 shadow-lg">

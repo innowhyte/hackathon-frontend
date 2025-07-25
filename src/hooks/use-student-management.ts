@@ -7,6 +7,7 @@ import {
   useUpdateStudent,
   useDeleteStudent,
   usePostStudentFeedback,
+  useDeleteStudentFeedback,
 } from '../mutations/student-mutations'
 import { useLatestClassroom } from '../queries/classroom-queries'
 
@@ -63,6 +64,7 @@ export const useStudentManagement = (initialGradeId?: number) => {
   const updateStudentMutation = useUpdateStudent()
   const deleteStudentMutation = useDeleteStudent()
   const postFeedbackMutation = usePostStudentFeedback()
+  const deleteFeedbackMutation = useDeleteStudentFeedback()
 
   // Grade selection handlers
   const handleGradeChange = (gradeId: number) => {
@@ -152,8 +154,19 @@ export const useStudentManagement = (initialGradeId?: number) => {
     )
   }
 
-  const handleDeleteFeedback = () => {
-    // TODO: Implement when API supports it
+  const handleDeleteFeedback = (studentId: number, feedbackId: string) => {
+    deleteFeedbackMutation.mutate(
+      { studentId, feedbackId },
+      {
+        onSuccess: () => {
+          toast.success('Feedback deleted successfully')
+          refetchFeedback()
+        },
+        onError: () => {
+          toast.error('Failed to delete feedback')
+        },
+      },
+    )
   }
 
   // Utility functions
@@ -189,6 +202,7 @@ export const useStudentManagement = (initialGradeId?: number) => {
     updateStudentMutation,
     deleteStudentMutation,
     postFeedbackMutation,
+    deleteFeedbackMutation,
 
     // Handlers
     handleGradeChange,
