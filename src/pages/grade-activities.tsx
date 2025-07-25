@@ -32,7 +32,7 @@ export default function GradeActivities() {
   const navigate = useNavigate()
 
   // Activities generation hook
-  const { isGenerating, progress, error, generateActivities, reset } = useGradeActivitiesGeneration()
+  const { isGenerating, progress, generateActivities, reset } = useGradeActivitiesGeneration()
 
   // Activities query and mutation
   const { data: fetchedActivities, isLoading: isActivitiesLoading } = useActivitiesByDayGradeTopic(
@@ -43,12 +43,12 @@ export default function GradeActivities() {
   const saveActivitiesMutation = useSaveActivities()
 
   // State for activities generation
-  const [threadId] = useState(() => crypto.randomUUID())
   const [generatedActivities, setGeneratedActivities] = useState<Activity[]>([])
   const [teacher_requirements, setTeacherRequirements] = useState('')
   const [carouselIndex, setCarouselIndex] = useState(0)
   const [modalities, setModalities] = useState<string[]>([])
   const [modes_of_interaction, setModesOfInteraction] = useState<string>('')
+  const [showAIHelpDialog, setShowAIHelpDialog] = useState(false)
 
   // Separate effect for fetched data
   useEffect(() => {
@@ -103,16 +103,22 @@ export default function GradeActivities() {
   const handleGenerateActivities = async () => {
     // Generate activities
     await generateActivities({
+      previous_activities:
+        generatedActivities?.length > 0
+          ? generatedActivities
+          : fetchedActivities?.activities && fetchedActivities?.activities.length > 0
+            ? fetchedActivities?.activities
+            : null,
       day_id: day as string,
       grade_id: gradeId as string,
       topic_id: topicId?.toString() || '',
-      thread_id: threadId,
       modes_of_interaction: modes_of_interaction_label,
       modalities: modalitiesForApi,
       teacher_requirements,
       onActivitiesGenerated: (activitiesData: Activity[]) => {
         setGeneratedActivities(activitiesData)
         setCarouselIndex(0)
+        setTeacherRequirements('')
       },
       onError: errorMessage => {
         console.error('Error:', errorMessage)
@@ -312,7 +318,7 @@ export default function GradeActivities() {
               </div>
             ) : fetchedActivities && fetchedActivities.activities && fetchedActivities.activities.length > 0 ? (
               <div className="bg-muted rounded-xl">
-                <h4 className="text-foreground px-4 py-2 flex items-center text-lg font-medium">
+                <h4 className="text-foreground flex items-center px-4 py-2 text-lg font-medium">
                   <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
@@ -393,11 +399,6 @@ export default function GradeActivities() {
             )}
           </div>
 
-          {/* Error Display */}
-          {error && (
-            <div className="mb-4 w-full rounded-xl bg-red-100 p-4 text-center text-red-700 shadow">{error}</div>
-          )}
-
           {/* Progress Display */}
           {isGenerating && progress && (
             <div className="bg-muted mb-4 flex items-center gap-2 rounded-lg p-3">
@@ -412,11 +413,11 @@ export default function GradeActivities() {
               <textarea
                 value={teacher_requirements}
                 onChange={e => {
-                  setTeacherRequirements(e.target.value.trim())
+                  setTeacherRequirements(e.target.value)
                 }}
                 placeholder="Type your activity request or customization here..."
                 rows={3}
-                className="border-border focus:border-secondary text-foreground w-full resize-none rounded-2xl border-2 p-4 pr-12 transition-colors duration-200 focus:ring-0 focus:outline-none"
+                className="border-border focus:border-secondary text-foreground w-full resize-none rounded-2xl border-2 p-4 pr-4 transition-colors duration-200 focus:ring-0 focus:outline-none"
                 disabled={isGenerating}
               />
             </div>
@@ -466,7 +467,11 @@ export default function GradeActivities() {
           </div>
         </div>
       </div>
-      <AIHelpDialog />
+      <AIHelpDialog
+        showAIHelpDialog={showAIHelpDialog}
+        setShowAIHelpDialog={setShowAIHelpDialog}
+        topicId={topicId?.toString()}
+      />
     </div>
   )
 }

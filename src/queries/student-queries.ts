@@ -41,8 +41,6 @@ export const useStudentsByGrade = (gradeId: number | null) => {
     queryKey: ['students', gradeId],
     queryFn: () => fetchStudentsByGrade(gradeId!),
     enabled: !!gradeId, // Only run query if gradeId is provided
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
   })
 }
 
@@ -50,8 +48,6 @@ export const useAllStudents = () => {
   return useQuery({
     queryKey: ['students'],
     queryFn: fetchAllStudents,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
   })
 }
 
@@ -61,8 +57,6 @@ export const useStudentById = (studentId: number | null) => {
     queryKey: ['student', studentId],
     queryFn: () => fetchStudentById(studentId!),
     enabled: !!studentId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
   })
 }
 
@@ -119,8 +113,6 @@ export const useAllStudentsFeedback = (studentIds: number[]) => {
     queryKey: ['allStudentsFeedback', studentIds],
     queryFn: () => fetchAllStudentsFeedback(studentIds),
     enabled: studentIds.length > 0,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
   })
 }
 
@@ -162,7 +154,5 @@ export const useStudentReport = (studentId: number | null) => {
     queryKey: ['studentReport', studentId],
     queryFn: () => fetchStudentReport(studentId!),
     enabled: !!studentId,
-    staleTime: 0,
-    gcTime: 5 * 60 * 1000,
   })
 }

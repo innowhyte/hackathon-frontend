@@ -2,41 +2,44 @@ import { useState, useCallback } from 'react'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import type { Classroom } from '@/queries/classroom-queries'
 
-export interface StoryGenerationState {
+export interface GameGenerationState {
   isGenerating: boolean
   progress: string
-  story: string
-  idea: string
+  game: Game | null
   error: string | null
 }
 
-export interface Story {
-  story: string
-  idea: string
+export interface Game {
+  name: string
+  description: string
+  materials_required: string[]
+  rules: string[]
+  game_play: string
+  game_purpose: string
 }
 
-export interface StoryGenerationOptions {
+export interface GameGenerationOptions {
   latestClassroom: Classroom
   day_id: string
   topic_id: string
-  teacher_requirements: string // This will be mapped to teacher_requirements
+  teacher_requirements?: string
   thread_id: string
-  previous_story?: Story | null
+  previous_game?: Game | null
   onProgress?: (progress: string) => void
-  onStoryGenerated?: (story: Story) => void
+  onGameGenerated?: (game: Game) => void
   onError?: (error: string) => void
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-export const useStoryGeneration = () => {
+export const useGameGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState('')
-  const [storyObj, setStoryObj] = useState<Story | null>(null)
+  const [gameObj, setGameObj] = useState<Game | null>(null)
   const [error, setError] = useState<string | null>(null)
   const abortController = new AbortController()
 
-  const generateStory = useCallback(async (options: StoryGenerationOptions) => {
+  const generateGame = useCallback(async (options: GameGenerationOptions) => {
     if (isGenerating) return
 
     let isMounted = true
@@ -47,19 +50,19 @@ export const useStoryGeneration = () => {
       topic_id,
       teacher_requirements,
       thread_id,
+      previous_game,
       onProgress,
-      onStoryGenerated,
+      onGameGenerated,
       onError,
     } = options
 
     // Reset state
     setIsGenerating(true)
     setProgress('')
-    setStoryObj(null)
+    setGameObj(null)
     setError(null)
 
-    // /api/topics/{topic_id}/days/{day_number}/story
-    await fetchEventSource(`${API_BASE_URL}/api/topics/${topic_id}/days/${day_id}/story`, {
+    await fetchEventSource(`${API_BASE_URL}/api/topics/${topic_id}/days/${day_id}/game`, {
       signal: abortController.signal,
       openWhenHidden: true,
       method: 'POST',
@@ -68,8 +71,8 @@ export const useStoryGeneration = () => {
       },
       body: JSON.stringify({
         classroom_id: String(latestClassroom.id),
-        previous_story: options.previous_story ? options.previous_story : undefined,
         teacher_requirements: teacher_requirements || undefined,
+        previous_game: previous_game || undefined,
         thread_id,
       }),
       onmessage(event) {
@@ -84,12 +87,12 @@ export const useStoryGeneration = () => {
 
           case 'data':
             try {
-              const storyObj = JSON.parse(data)
-              setStoryObj(storyObj)
-              onStoryGenerated?.(storyObj)
+              const gameObj = JSON.parse(data)
+              setGameObj(gameObj)
+              onGameGenerated?.(gameObj)
             } catch (e) {
-              setError('Failed to parse story data')
-              onError?.('Failed to parse story data')
+              setError('Failed to parse game data')
+              onError?.('Failed to parse game data')
             }
             break
 
@@ -100,35 +103,28 @@ export const useStoryGeneration = () => {
             break
 
           default:
-            // Handle any other event types
             console.log('Unknown event type:', eventType, data)
         }
       },
       onclose() {
         if (!isMounted) return
-        // Connection closed
         setIsGenerating(false)
       },
       onerror(err) {
-        // Network or other errors
-        let errorMessage = err.message || 'Failed to generate story'
-
+        let errorMessage = err.message || 'Failed to generate game'
         setError(errorMessage)
         onError?.(errorMessage)
         setIsGenerating(false)
-        // Abort the connection to prevent infinite retries
         abortController.abort()
-        throw err // Prevent infinite retry loop
+        throw err
       },
-      // Handle HTTP errors
-      // eslint-disable-next-line @typescript-eslint/require-await
       async onopen(response) {
         if (!isMounted) return
         if (response.ok) {
-          console.log('Story generation stream opened successfully')
+          console.log('Game generation stream opened successfully')
         } else {
-          console.error('Story generation stream failed with status:', response.status)
-          setError(`Failed to start story generation: HTTP ${response.status}`)
+          console.error('Game generation stream failed with status:', response.status)
+          setError(`Failed to start game generation: HTTP ${response.status}`)
           setIsGenerating(false)
           abortController.abort()
           throw new Error(`HTTP ${response.status}`)
@@ -144,16 +140,16 @@ export const useStoryGeneration = () => {
   const reset = useCallback(() => {
     setIsGenerating(false)
     setProgress('')
-    setStoryObj(null)
+    setGameObj(null)
     setError(null)
   }, [])
 
   return {
     isGenerating,
     progress,
-    storyObj,
+    gameObj,
     error,
-    generateStory,
+    generateGame,
     cancelGeneration,
     reset,
   }

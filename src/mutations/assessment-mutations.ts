@@ -93,10 +93,11 @@ export const useDeleteAssessment = () => {
 }
 
 export function useEvaluateMcqAssessment(studentId: number, assessmentId: number) {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (images: File[]) => {
       const formData = new FormData()
-      images.forEach((image, idx) => {
+      images.forEach(image => {
         formData.append('images', image)
       })
       // /api/students/{student_id}/mcq-evaluations/{assessment_id}
@@ -109,10 +110,16 @@ export function useEvaluateMcqAssessment(studentId: number, assessmentId: number
       }
       return response.json()
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['student-evaluation', studentId, assessmentId],
+      })
+    },
   })
 }
 
 export function useEvaluateOralAssessment(studentId: number, assessmentId: number) {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (audioBlob: Blob) => {
       const formData = new FormData()
@@ -125,6 +132,11 @@ export function useEvaluateOralAssessment(studentId: number, assessmentId: numbe
         throw new Error('Failed to evaluate oral assessment')
       }
       return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['student-evaluation', studentId, assessmentId],
+      })
     },
   })
 }

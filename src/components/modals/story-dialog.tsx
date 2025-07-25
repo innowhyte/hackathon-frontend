@@ -3,8 +3,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '../ui/button'
 import { useStoryGeneration } from '../../hooks/use-story-generation'
 import { Loader2, Send, Save, X } from 'lucide-react'
-import { Alert, AlertDescription } from '../ui/alert'
 import type { Classroom } from '@/queries/classroom-queries'
+import type { Story } from '@/queries/story-queries'
 import { useStoryByDayAndTopic } from '../../queries/story-queries'
 import { useSaveStory } from '../../mutations/story-mutations'
 import { toast } from 'sonner'
@@ -16,28 +16,31 @@ const StoryDialog = ({
   setShowStoryDialog,
   latestClassroom,
 }: {
-  topic_id: string
+  topic_id: number | string
   day_id: string
   showStoryDialog: boolean
   setShowStoryDialog: (show: boolean) => void
   latestClassroom: Classroom
 }) => {
   // Story generation hook
-  const { isGenerating, progress, error, idea, generateStory, cancelGeneration, reset } = useStoryGeneration()
+  const { isGenerating, progress, generateStory, cancelGeneration, reset } = useStoryGeneration()
 
   // Story query and mutation
-  const { data: fetchedStory, isLoading: isStoryLoading } = useStoryByDayAndTopic(day_id, topic_id)
+  const { data: fetchedStory, isLoading: isStoryLoading } = useStoryByDayAndTopic(
+    typeof topic_id === 'number' ? topic_id : parseInt(topic_id, 10),
+    day_id.toString(),
+  )
   const saveStoryMutation = useSaveStory()
 
   // State for story generation
   const [threadId] = useState(() => crypto.randomUUID())
-  const [generatedStory, setGeneratedStory] = useState('')
+  const [generatedStory, setGeneratedStory] = useState<Story | null>(null)
   const [currentMessage, setCurrentMessage] = useState('')
 
   // Reset story when dialog opens
   useEffect(() => {
     if (showStoryDialog) {
-      setGeneratedStory('')
+      setGeneratedStory(null)
       setCurrentMessage('')
       reset()
     }
@@ -49,18 +52,25 @@ const StoryDialog = ({
     // Clear input
     setCurrentMessage('')
 
+    // Prepare previous_story if available
+    // Ensure previous_story matches the expected type (with idea as string)
+    let previous_story: Story | null | undefined = undefined
+    if (generatedStory) {
+      previous_story = generatedStory
+    } else if (fetchedStory) {
+      previous_story = fetchedStory
+    }
+
     // Generate story response
     await generateStory({
       latestClassroom,
-      day_id,
-      topic_id,
-      context: message,
+      day_id: day_id.toString(),
+      topic_id: topic_id.toString(),
+      teacher_requirements: message,
       thread_id: threadId,
-      onProgress: progressMessage => {
-        console.log('Progress:', progressMessage)
-      },
-      onStoryGenerated: storyContent => {
-        setGeneratedStory(storyContent)
+      previous_story: previous_story as any, // typecast to satisfy type, since we ensure idea is string above
+      onStoryGenerated: storyObj => {
+        setGeneratedStory(storyObj)
       },
       onError: errorMessage => {
         console.error('Error:', errorMessage)
@@ -72,7 +82,12 @@ const StoryDialog = ({
   const handleSaveToDatabase = () => {
     if (!generatedStory) return
     saveStoryMutation.mutate(
-      { day_id, topic_id, story: generatedStory, idea },
+      {
+        day_id: day_id.toString(),
+        topic_id: topic_id.toString(),
+        story: generatedStory.story,
+        idea: generatedStory.idea,
+      },
       {
         onSuccess: () => {
           toast.success('Story saved!')
@@ -117,20 +132,6 @@ const StoryDialog = ({
           <DialogDescription className="text-start">Click save when you&apos;re done.</DialogDescription>
         </DialogHeader>
         <div className="p-0">
-          {/* Error Display */}
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          {/* Progress Display */}
-          {isGenerating && progress && (
-            <div className="bg-muted mb-4 flex items-center gap-2 rounded-lg p-3">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-sm">{progress}</span>
-            </div>
-          )}
-
           {/* Story Display */}
           <div className="mb-6">
             {isStoryLoading ? (
@@ -149,7 +150,14 @@ const StoryDialog = ({
                   Generated Story
                 </h4>
                 <div className="text-foreground scrollbar-thin scrollbar-thumb-secondary scrollbar-track-muted max-h-64 overflow-y-auto pr-2 text-sm leading-relaxed">
-                  <p className="whitespace-pre-wrap">{generatedStory}</p>
+                  <div className="mb-2">
+                    <span className="font-semibold">Idea:</span>
+                    <span className="ml-2">{generatedStory?.idea}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold">Story:</span>
+                    <p className="mt-1 whitespace-pre-wrap">{generatedStory?.story}</p>
+                  </div>
                 </div>
               </div>
             ) : fetchedStory && fetchedStory.story ? (
@@ -166,7 +174,14 @@ const StoryDialog = ({
                   Saved Story
                 </h4>
                 <div className="text-foreground scrollbar-thin scrollbar-thumb-secondary scrollbar-track-muted max-h-64 overflow-y-auto pr-2 text-sm leading-relaxed">
-                  <p className="whitespace-pre-wrap">{fetchedStory.story}</p>
+                  <div className="mb-2">
+                    <span className="font-semibold">Idea:</span>
+                    <span className="ml-2">{fetchedStory.idea}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold">Story:</span>
+                    <p className="mt-1 whitespace-pre-wrap">{fetchedStory.story}</p>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -177,6 +192,13 @@ const StoryDialog = ({
               </div>
             )}
           </div>
+          {/* Progress Display */}
+          {isGenerating && progress && (
+            <div className="bg-muted mb-4 flex items-center gap-2 rounded-lg p-3">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">{progress}</span>
+            </div>
+          )}
 
           {/* Input Area */}
           <div className="space-y-4">
@@ -188,7 +210,7 @@ const StoryDialog = ({
                 }}
                 placeholder="Type your story request or customization here..."
                 rows={3}
-                className="border-border focus:border-secondary text-foreground w-full resize-none rounded-2xl border-2 p-4 pr-12 transition-colors duration-200 focus:ring-0 focus:outline-none"
+                className="border-border focus:border-secondary text-foreground w-full resize-none rounded-2xl border-2 p-4 pr-4 transition-colors duration-200 focus:ring-0 focus:outline-none"
                 disabled={isGenerating}
               />
             </div>

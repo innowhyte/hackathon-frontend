@@ -4,8 +4,6 @@ import { useState } from 'react'
 import BottomNav from '../components/bottom-nav'
 import Header from '../components/header'
 import { Button } from '../components/ui/button'
-import { Input } from '../components/ui/input'
-import { Textarea } from '../components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
 import { useAssessmentDetails } from '../queries/assessment-queries'
@@ -15,6 +13,7 @@ import { FileText } from 'lucide-react'
 import { useEvaluateMcqAssessment, useEvaluateOralAssessment } from '../mutations/assessment-mutations'
 import { useStudentAssessmentEvaluation } from '../queries/assessment-queries'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../components/ui/table'
+import { toast } from 'sonner'
 
 const assessmentTypeMap = {
   mcq: 'Multiple Choice Question',
@@ -36,8 +35,6 @@ export default function StudentAssessment() {
   const [recordingTimer, setRecordingTimer] = useState<NodeJS.Timeout | null>(null)
   const [studentImages, setStudentImages] = useState<Array<{ url: string; file: File }>>([])
   const [studentRecordings, setStudentRecordings] = useState<Array<{ url: string; duration: number }>>([])
-  const [studentScore, setStudentScore] = useState<string>('')
-  const [studentComment, setStudentComment] = useState<string>('')
 
   // Add mutation hooks
   const mcqMutation = useEvaluateMcqAssessment(Number(studentId), Number(assessmentId))
@@ -54,10 +51,7 @@ export default function StudentAssessment() {
   const { data: student, isLoading: isStudentLoading } = useStudentById(Number(studentId))
 
   // Fetch student assessment evaluation result
-  const { data: evaluationResult, isLoading: isEvaluationLoading } = useStudentAssessmentEvaluation(
-    studentId,
-    assessmentId,
-  )
+  const { data: evaluationResult } = useStudentAssessmentEvaluation(Number(studentId), Number(assessmentId))
 
   // Set title based on student and assessment data
   const title =
@@ -147,6 +141,8 @@ export default function StudentAssessment() {
       }))
       setStudentImages(prev => [...prev, ...newImages])
     }
+    // Reset the input value to allow selecting the same file again
+    event.target.value = ''
   }
 
   const removeImage = (imageIndex: number) => {
@@ -219,9 +215,10 @@ export default function StudentAssessment() {
           result = await oralMutation.mutateAsync(audioBlob)
         }
         console.log('Assessment Evaluation Result:', result)
-        navigate(`/grade/${grade}/assessment/${assessmentId}${topicId ? `?topicId=${topicId}` : ''}`)
+        toast.success('Assessment submitted successfully')
       } catch (error) {
         console.error('Error submitting assessment:', error)
+        toast.error('Error submitting assessment')
       }
     }
   }

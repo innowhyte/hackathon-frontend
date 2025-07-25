@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input'
 import { Textarea } from '../components/ui/textarea'
 import Header from '../components/header'
-import AIHelpDialog from '../components/modals/ai-help-dialog'
 import { useLatestClassroom } from '../queries/classroom-queries'
 import { useCreateTopic } from '../mutations/topic-mutations'
 import { useCreateWeeklyPlan } from '../mutations/topic-mutations'
@@ -142,7 +141,7 @@ export default function TopicSetup() {
 
   return (
     <div className="bg-background min-h-screen pb-20">
-      <Header title="Sahayak" onBack={() => navigate('/')} showAIHelp />
+      <Header title="Sahayak" onBack={() => navigate('/')} />
 
       <div className="px-4 py-3">
         <div className="mx-auto w-full max-w-md">
@@ -347,7 +346,6 @@ export default function TopicSetup() {
           </div>
         </div>
       </div>
-      <AIHelpDialog />
       <BottomNav />
     </div>
   )

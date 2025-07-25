@@ -5,6 +5,7 @@ import Header from '../components/header'
 import { Button } from '../components/ui/button'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
 import BlackboardDialog from '../components/modals/blackboard-dialog'
+import VideoDialog from '../components/modals/video-dialog'
 import StoryDialog from '../components/modals/story-dialog'
 import FlashcardDialog from '../components/modals/flashcard-dialog'
 import GamifiedDialog from '../components/modals/gamified-dialog'
@@ -12,7 +13,6 @@ import QuestionPromptsDialog from '../components/modals/question-prompts-dialog'
 import { useLatestClassroom } from '@/queries/classroom-queries'
 import TopicSelector from '../components/topic-selector'
 import { useAllTopics } from '../queries/topic-queries'
-import { data } from '../lib/data'
 import Loading from '@/components/loading'
 
 export default function WholeClassMaterials() {
@@ -27,7 +27,8 @@ export default function WholeClassMaterials() {
   const [showFlashcardDialog, setShowFlashcardDialog] = useState(false)
   const [showGamifiedDialog, setShowGamifiedDialog] = useState(false)
   const [showQuestionPromptsDialog, setShowQuestionPromptsDialog] = useState(false)
-
+  const [showVideoDialog, setShowVideoDialog] = useState(false)
+  const [showAIHelpDialog, setShowAIHelpDialog] = useState(false)
   const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
   const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
 
@@ -45,7 +46,7 @@ export default function WholeClassMaterials() {
 
   // Get lesson plan from selected topic
   const selectedTopic = topics?.find(t => t.id === topicId)
-  const lessonPlan: Record<string, any> = data[selectedTopic?.name as keyof typeof data]?.outputs || {}
+  const lessonPlan = selectedTopic?.weekly_plan || {}
 
   const selectedDay = parseInt(day || '1')
   const currentDayPlan = lessonPlan ? lessonPlan[`day_${selectedDay}`] : undefined
@@ -91,6 +92,14 @@ export default function WholeClassMaterials() {
       color: 'bg-red-500',
       onClick: () => setShowQuestionPromptsDialog(true),
     },
+    {
+      id: 'video',
+      title: 'Video',
+      description: 'Generate a video for the lesson',
+      icon: '🎥',
+      color: 'bg-red-500',
+      onClick: () => setShowVideoDialog(true),
+    },
   ]
 
   return (
@@ -105,6 +114,7 @@ export default function WholeClassMaterials() {
           }
         }}
         showAIHelp={true}
+        onShowAIHelp={() => setShowAIHelpDialog(true)}
       />
 
       <div className="p-6">
@@ -155,8 +165,16 @@ export default function WholeClassMaterials() {
       </div>
 
       {/* Dialogs */}
-      <AIHelpDialog />
-      <BlackboardDialog showBlackboardDialog={showBlackboardDialog} setShowBlackboardDialog={setShowBlackboardDialog} />
+      <AIHelpDialog showAIHelpDialog={showAIHelpDialog} setShowAIHelpDialog={setShowAIHelpDialog} />
+      {topicId && day && (
+        <BlackboardDialog
+          topic_id={topicId}
+          day_id={day}
+          showBlackboardDialog={showBlackboardDialog}
+          setShowBlackboardDialog={setShowBlackboardDialog}
+          latestClassroom={latestClassroom}
+        />
+      )}
       {topicId && day && (
         <StoryDialog
           topic_id={topicId.toString()}
@@ -166,12 +184,42 @@ export default function WholeClassMaterials() {
           latestClassroom={latestClassroom}
         />
       )}
-      <FlashcardDialog showFlashcardDialog={showFlashcardDialog} setShowFlashcardDialog={setShowFlashcardDialog} />
-      <GamifiedDialog showGamifiedDialog={showGamifiedDialog} setShowGamifiedDialog={setShowGamifiedDialog} />
-      <QuestionPromptsDialog
-        showQuestionPromptsDialog={showQuestionPromptsDialog}
-        setShowQuestionPromptsDialog={setShowQuestionPromptsDialog}
-      />
+      {topicId && day && (
+        <FlashcardDialog
+          topic_id={topicId}
+          day_id={day}
+          showFlashcardDialog={showFlashcardDialog}
+          setShowFlashcardDialog={setShowFlashcardDialog}
+          latestClassroom={latestClassroom}
+        />
+      )}
+      {topicId && day && (
+        <GamifiedDialog
+          topic_id={topicId}
+          day_id={day}
+          showGamifiedDialog={showGamifiedDialog}
+          setShowGamifiedDialog={setShowGamifiedDialog}
+          latestClassroom={latestClassroom}
+        />
+      )}
+      {topicId && day && (
+        <QuestionPromptsDialog
+          topic_id={topicId}
+          day_id={day}
+          showQuestionPromptsDialog={showQuestionPromptsDialog}
+          setShowQuestionPromptsDialog={setShowQuestionPromptsDialog}
+          latestClassroom={latestClassroom}
+        />
+      )}
+      {topicId && day && (
+        <VideoDialog
+          topic_id={topicId}
+          day_id={day}
+          showVideoDialog={showVideoDialog}
+          setShowVideoDialog={setShowVideoDialog}
+          latestClassroom={latestClassroom}
+        />
+      )}
     </div>
   )
 }

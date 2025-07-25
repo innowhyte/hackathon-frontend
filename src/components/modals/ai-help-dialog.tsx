@@ -1,56 +1,42 @@
-import { useContext } from 'react'
-import { AppContext } from '../../context/app-context'
+import { useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
+import { useAIHelpAnswer } from '@/hooks/use-ai-help-answer'
 
-const AIHelpDialog = () => {
-  const context = useContext(AppContext)
-
-  if (!context) {
-    return null
-  }
-
-  const { showAIHelpDialog, setShowAIHelpDialog, aiHelpPrompt, setAiHelpPrompt, aiHelpResponse, setAiHelpResponse } =
-    context
+const AIHelpDialog = ({
+  showAIHelpDialog,
+  setShowAIHelpDialog,
+  topicId = '3', // TODO: Replace with real topic id prop
+  threadId = '1234', // TODO: Replace with real thread id prop
+}: {
+  showAIHelpDialog: boolean
+  setShowAIHelpDialog: (show: boolean) => void
+  topicId?: string
+  threadId?: string
+}) => {
+  const [aiHelpPrompt, setAiHelpPrompt] = useState('')
+  const { isGenerating, progress, answer, error, generateAnswer, reset, cancelGeneration } = useAIHelpAnswer()
 
   const handleAIHelpSubmit = () => {
     if (aiHelpPrompt.trim()) {
-      const responses = {
-        default: `Thank you for your question about "${aiHelpPrompt}". Here are some suggestions to help you address this student concern:\n\n1. **Break it down**: Start with the most basic concepts and build up gradually. Use simple language and relatable examples.\n\n2. **Use visual aids**: Create diagrams, drawings, or use physical objects to make abstract concepts more concrete.\n\n3. **Interactive approach**: Ask the student questions to gauge their understanding and adjust your explanation accordingly.\n\n4. **Real-world connections**: Connect the topic to things the student already knows or experiences in daily life.\n\n5. **Practice together**: Work through examples step by step with the student before asking them to try independently.\n\nWould you like me to provide more specific strategies for this particular situation?`,
-        math: `For mathematical concepts, I recommend:\n\n• Start with concrete examples using objects they can touch and count\n• Use visual representations like drawings or charts\n• Break complex problems into smaller, manageable steps\n• Encourage the student to explain their thinking process\n• Provide plenty of practice with similar problems\n• Connect math to real-life situations they can relate to\n\nRemember to be patient and celebrate small victories to build their confidence!`,
-        science: `For science topics, try these approaches:\n\n• Begin with hands-on experiments or demonstrations\n• Use analogies to compare new concepts with familiar things\n• Encourage questions and curiosity\n• Show real-world applications of the scientific concepts\n• Use storytelling to make the content more engaging\n• Break down complex processes into simple steps\n\nScience is best learned through exploration and discovery!`,
-      }
+      generateAnswer({
+        topic_id: topicId,
+        thread_id: threadId,
+        question: aiHelpPrompt,
+      })
+    }
+  }
 
-      let response = responses.default
-      if (
-        aiHelpPrompt.toLowerCase().includes('math') ||
-        aiHelpPrompt.toLowerCase().includes('calculation') ||
-        aiHelpPrompt.toLowerCase().includes('number')
-      ) {
-        response = responses.math
-      } else if (
-        aiHelpPrompt.toLowerCase().includes('science') ||
-        aiHelpPrompt.toLowerCase().includes('experiment') ||
-        aiHelpPrompt.toLowerCase().includes('nature')
-      ) {
-        response = responses.science
-      }
-
-      setAiHelpResponse(response)
+  const handleDialogClose = (open: boolean) => {
+    setShowAIHelpDialog(open)
+    if (!open) {
+      reset()
+      setAiHelpPrompt('')
     }
   }
 
   return (
-    <Dialog
-      open={showAIHelpDialog}
-      onOpenChange={open => {
-        setShowAIHelpDialog(open)
-        if (!open) {
-          setAiHelpResponse('')
-          setAiHelpPrompt('')
-        }
-      }}
-    >
+    <Dialog open={showAIHelpDialog} onOpenChange={handleDialogClose}>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
@@ -65,7 +51,7 @@ const AIHelpDialog = () => {
             AI Teaching Assistant
           </DialogTitle>
         </DialogHeader>
-        <div className="p-6 pt-0">
+        <div className="p-0">
           <div className="mb-6">
             <label className="text-muted-foreground mb-3 block text-sm font-medium">
               Describe the student's doubt or question:
@@ -77,6 +63,7 @@ const AIHelpDialog = () => {
                 placeholder="e.g., A student is confused about how to explain the concept of photosynthesis to a 3rd grader. How can I make it simpler?"
                 rows={5}
                 className="border-border focus:border-secondary text-foreground w-full resize-none rounded-2xl border-2 p-4 transition-colors duration-200 focus:ring-0 focus:outline-none"
+                disabled={isGenerating}
               />
             </div>
           </div>
@@ -84,7 +71,7 @@ const AIHelpDialog = () => {
             onClick={handleAIHelpSubmit}
             variant="secondary"
             className="w-full rounded-3xl px-6 py-4 font-medium transition-all duration-300"
-            disabled={!aiHelpPrompt.trim()}
+            disabled={!aiHelpPrompt.trim() || isGenerating}
           >
             <span className="flex items-center justify-center">
               <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,10 +82,18 @@ const AIHelpDialog = () => {
                   d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
                 />
               </svg>
-              Submit
+              {isGenerating ? 'Generating...' : 'Submit'}
             </span>
           </Button>
-          {aiHelpResponse && (
+          {isGenerating && (
+            <div className="text-muted-foreground mt-4 text-sm">
+              {progress || 'Generating answer...'}
+              <Button variant="ghost" className="ml-4 h-6 px-2 py-0 text-xs" onClick={cancelGeneration}>
+                Cancel
+              </Button>
+            </div>
+          )}
+          {answer && (
             <div className="bg-muted border-secondary mt-6 rounded-2xl border-l-4 p-4">
               <h4 className="text-foreground mb-3 flex items-center text-lg font-medium">
                 <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,10 +107,11 @@ const AIHelpDialog = () => {
                 Assistant Response
               </h4>
               <div className="text-foreground scrollbar-thin scrollbar-thumb-secondary scrollbar-track-muted max-h-64 overflow-y-auto pr-2 text-sm leading-relaxed whitespace-pre-line">
-                {aiHelpResponse}
+                {answer}
               </div>
             </div>
           )}
+          {error && <div className="text-destructive mt-4 text-sm">{error}</div>}
         </div>
       </DialogContent>
     </Dialog>
