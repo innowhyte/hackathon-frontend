@@ -13,6 +13,12 @@ export interface SaveActivitiesInput {
 }
 
 const saveActivities = async (data: SaveActivitiesInput): Promise<void> => {
+  const activities = data.activities.map((activity) => ({
+    ...activity,
+    modes_of_interaction: data.modes_of_interaction,
+    modalities: data.modalities,
+  }))
+
   const response = await fetch(
     `${API_BASE_URL}/api/days/${data.day_id}/grades/${data.grade_id}/topics/${data.topic_id}/activities`,
     {
@@ -21,9 +27,7 @@ const saveActivities = async (data: SaveActivitiesInput): Promise<void> => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        modes_of_interaction: data.modes_of_interaction,
-        modalities: data.modalities,
-        activities: data.activities,
+        activities: activities,
       }),
     },
   )

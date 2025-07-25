@@ -409,7 +409,9 @@ export default function Topics() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {topicMaterials.map((material: TopicMaterial) => (
                     <Card key={material.id} className="relative overflow-hidden">
-                      {material.content_metadata?.has_diagrams ? (
+                      {material.content_link.includes('.png') ||
+                      material.content_link.includes('.jpg') ||
+                      material.content_link.includes('.jpeg') ? (
                         // Show image for materials with diagrams
                         <div className="bg-muted flex aspect-video w-full items-center justify-center">
                           <img

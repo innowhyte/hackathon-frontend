@@ -78,7 +78,7 @@ export default function WholeClassMaterials() {
     },
     {
       id: 'gamified',
-      title: 'Gamified activities',
+      title: 'Games',
       description: 'Create fun, game-based learning activities',
       icon: '😊',
       color: 'bg-orange-500',

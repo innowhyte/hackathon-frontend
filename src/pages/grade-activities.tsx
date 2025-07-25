@@ -9,6 +9,7 @@ import { useActivitiesByDayGradeTopic, type Activity } from '../queries/activiti
 import { useSaveActivities } from '../mutations/activities-mutations'
 import { toast } from 'sonner'
 import { Loader2, Send, Save } from 'lucide-react'
+import { Badge } from '../components/ui/badge'
 
 const modeOfInteractionOptions = [
   { id: 'independent', label: 'Work independently' },
@@ -49,15 +50,6 @@ export default function GradeActivities() {
   const [modalities, setModalities] = useState<string[]>([])
   const [modes_of_interaction, setModesOfInteraction] = useState<string>('')
   const [showAIHelpDialog, setShowAIHelpDialog] = useState(false)
-
-  // Separate effect for fetched data
-  useEffect(() => {
-    if (fetchedActivities) {
-      setModalities(fetchedActivities.modalities)
-      setModesOfInteraction(fetchedActivities.modes_of_interaction)
-      setTeacherRequirements('')
-    }
-  }, [fetchedActivities])
 
   // Separate effect for cleanup when no data
   useEffect(() => {
@@ -330,6 +322,21 @@ export default function GradeActivities() {
                   Saved Activities
                 </h4>
                 <div className="relative w-full p-2">
+                  <div className="mb-2 flex justify-between px-4">
+                    <div className="flex items-center gap-2">
+                      {fetchedActivities.activities[carouselIndex]?.modes_of_interaction && (
+                        <Badge variant="secondary" className="bg-primary text-secondaryn">
+                          {modeOfInteractionOptions.find(option => option.id === fetchedActivities.activities[carouselIndex].modes_of_interaction)?.label}
+                        </Badge>
+                      )}
+                      {fetchedActivities.activities[carouselIndex]?.modalities &&
+                        fetchedActivities.activities[carouselIndex]?.modalities.map((modality: string, index: number) => (
+                          <Badge key={index} variant="secondary" className="bg-secondary text-primary">
+                            {modalityOptions.find(option => option.id === modality)?.label}
+                          </Badge>
+                        ))}
+                    </div>
+                  </div>
                   <div className="mb-6 min-h-[180px] rounded-2xl bg-white/90 p-4 shadow-lg">
                     <h4 className="mb-4 text-xl font-semibold text-neutral-800">
                       {fetchedActivities.activities[carouselIndex]?.name}

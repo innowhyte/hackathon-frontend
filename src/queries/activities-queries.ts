@@ -7,6 +7,8 @@ export interface Activity {
   description: string
   materials_required: string[]
   purpose: string
+  modes_of_interaction: string
+  modalities: string[]
 }
 
 export interface Activities {
@@ -14,8 +16,6 @@ export interface Activities {
   day_id: string
   grade_id: string
   topic_id: string
-  modes_of_interaction: string
-  modalities: string[]
   activities: Activity[]
 }
 
