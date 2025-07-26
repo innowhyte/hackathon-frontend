@@ -169,18 +169,18 @@ const BlackboardDialog = ({
 
             {/* Input Area */}
             <div className="space-y-4">
-              {/* <div className="relative">
+              <div className="relative">
                 <textarea
                   value={currentMessage}
                   onChange={e => {
                     setCurrentMessage(e.target.value)
                   }}
-                  placeholder="Describe what you want to draw on the blackboard..."
+                  placeholder="Add any additional details/requirements to the drawing..."
                   rows={3}
                   className="border-border focus:border-secondary text-foreground w-full resize-none rounded-2xl border-2 p-4 pr-4 transition-colors duration-200 focus:ring-0 focus:outline-none"
                   disabled={isGenerating}
                 />
-              </div> */}
+              </div>
 
               {/* Action Buttons */}
               <div className="flex gap-1">
