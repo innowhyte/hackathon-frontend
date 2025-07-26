@@ -122,6 +122,7 @@ const FlashcardDialog = ({
         <div className="flex h-full w-full items-center justify-center p-4">
           <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-gray-200 shadow-sm">
             <img
+              key={`${card.image_public_url}-${currentCardIndex}`}
               src={card.image_public_url}
               alt={card.visual_description}
               className="h-full w-full object-cover"

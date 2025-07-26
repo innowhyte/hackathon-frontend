@@ -8,6 +8,7 @@ import type { Story } from '@/queries/story-queries'
 import { useStoryByDayAndTopic } from '../../queries/story-queries'
 import { useSaveStory } from '../../mutations/story-mutations'
 import { toast } from 'sonner'
+import { MarkdownContent } from '../markdown'
 
 const StoryDialog = ({
   topic_id,
@@ -156,7 +157,9 @@ const StoryDialog = ({
                   </div>
                   <div>
                     <span className="font-semibold">Story:</span>
-                    <p className="mt-1 whitespace-pre-wrap">{generatedStory?.story}</p>
+                    <div className="mt-1">
+                      <MarkdownContent id={`generated-story-${threadId}`} content={generatedStory?.story || ''} />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -180,7 +183,9 @@ const StoryDialog = ({
                   </div>
                   <div>
                     <span className="font-semibold">Story:</span>
-                    <p className="mt-1 whitespace-pre-wrap">{fetchedStory.story}</p>
+                    <div className="mt-1">
+                      <MarkdownContent id={`fetched-story-${day_id}-${topic_id}`} content={fetchedStory.story} />
+                    </div>
                   </div>
                 </div>
               </div>

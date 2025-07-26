@@ -8,6 +8,7 @@ import type { Game } from '@/hooks/use-game-generation'
 import { useGame } from '../../queries/game-queries'
 import { useSaveGame } from '../../mutations/game-mutations'
 import { toast } from 'sonner'
+import { MarkdownContent } from '../markdown'
 
 const GamifiedDialog = ({
   topic_id,
@@ -157,11 +158,15 @@ const GamifiedDialog = ({
                 <div className="text-foreground scrollbar-thin scrollbar-thumb-secondary scrollbar-track-muted max-h-78 overflow-y-auto pr-2 text-sm leading-relaxed">
                   <div className="mb-3">
                     <span className="font-semibold">Description:</span>
-                    <p className="mt-1 ml-2">{currentGame.description}</p>
+                    <div className="mt-1 ml-2">
+                      <MarkdownContent id={`game-description-${threadId}`} content={currentGame.description || ''} />
+                    </div>
                   </div>
                   <div className="mb-3">
                     <span className="font-semibold">Purpose:</span>
-                    <p className="mt-1 ml-2">{currentGame.game_purpose}</p>
+                    <div className="mt-1 ml-2">
+                      <MarkdownContent id={`game-purpose-${threadId}`} content={currentGame.game_purpose || ''} />
+                    </div>
                   </div>
                   <div className="mb-3">
                     <span className="font-semibold">Materials Required:</span>
@@ -180,7 +185,9 @@ const GamifiedDialog = ({
                   </div>
                   <div className="mb-3">
                     <span className="font-semibold">How to Play:</span>
-                    <p className="mt-1 ml-2 whitespace-pre-wrap">{currentGame.game_play}</p>
+                    <div className="mt-1 ml-2">
+                      <MarkdownContent id={`game-play-${threadId}`} content={currentGame.game_play || ''} />
+                    </div>
                   </div>
                 </div>
               </div>

@@ -8,6 +8,7 @@ import type { QuestionPromptsResponse } from '@/hooks/use-question-prompts-gener
 import { useQuestionPrompts } from '../../queries/question-prompts-queries'
 import { useSaveQuestionPrompts } from '../../mutations/question-prompts-mutations'
 import { toast } from 'sonner'
+import { MarkdownContent } from '../markdown'
 
 const QuestionPromptsDialog = ({
   topic_id,
@@ -169,25 +170,25 @@ const QuestionPromptsDialog = ({
                 </h4>
                 <div className="relative w-full">
                   <div className="mb-6 min-h-[180px] rounded-2xl bg-white/90 p-6 shadow-lg">
-                    <div className="space-y-4">
-                      <p className="text-lg leading-relaxed font-semibold text-neutral-800">
-                        {currentQuestionPrompts.question_prompts[carouselIndex]?.question}
-                      </p>
-                      <div className="space-y-3">
-                        <div>
-                          <h5 className="mb-2 text-sm font-semibold text-neutral-700">Purpose</h5>
-                          <p className="text-sm leading-relaxed text-neutral-600">
-                            {currentQuestionPrompts.question_prompts[carouselIndex]?.purpose}
-                          </p>
+                                          <div className="space-y-4">
+                        <div className="text-lg leading-relaxed font-semibold text-neutral-800">
+                          <MarkdownContent id={`question-${threadId}-${carouselIndex}`} content={currentQuestionPrompts.question_prompts[carouselIndex]?.question || ''} />
                         </div>
-                        <div>
-                          <h5 className="mb-2 text-sm font-semibold text-neutral-700">Connection</h5>
-                          <p className="text-sm leading-relaxed text-neutral-600">
-                            {currentQuestionPrompts.question_prompts[carouselIndex]?.connection}
-                          </p>
+                        <div className="space-y-3">
+                          <div>
+                            <h5 className="mb-2 text-sm font-semibold text-neutral-700">Purpose</h5>
+                            <div className="text-sm leading-relaxed text-neutral-600">
+                              <MarkdownContent id={`purpose-${threadId}-${carouselIndex}`} content={currentQuestionPrompts.question_prompts[carouselIndex]?.purpose || ''} />
+                            </div>
+                          </div>
+                          <div>
+                            <h5 className="mb-2 text-sm font-semibold text-neutral-700">Connection</h5>
+                            <div className="text-sm leading-relaxed text-neutral-600">
+                              <MarkdownContent id={`connection-${threadId}-${carouselIndex}`} content={currentQuestionPrompts.question_prompts[carouselIndex]?.connection || ''} />
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
                   </div>
                   {/* Carousel Navigation */}
                   <div className="flex w-full items-center justify-between px-4">

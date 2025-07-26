@@ -136,6 +136,7 @@ const BlackboardDialog = ({
               ) : generatedDrawing ? (
                 <div className="text-center">
                   <img
+                    key={`generated-${generatedDrawing.image_url}-${threadId}`}
                     src={generatedDrawing.image_url}
                     alt="Generated Blackboard Drawing"
                     className="mx-auto max-h-64 max-w-full cursor-pointer rounded-lg border border-neutral-200 bg-neutral-100 object-contain transition-opacity hover:opacity-80"
@@ -145,6 +146,7 @@ const BlackboardDialog = ({
               ) : fetchedDrawing && fetchedDrawing.image_url ? (
                 <div className="text-center">
                   <img
+                    key={`saved-${fetchedDrawing.image_url}`}
                     src={fetchedDrawing.image_url}
                     alt="Saved Blackboard Drawing"
                     className="mx-auto max-h-64 max-w-full cursor-pointer rounded-lg border border-neutral-200 bg-neutral-100 object-contain transition-opacity hover:opacity-80"
@@ -240,6 +242,7 @@ const BlackboardDialog = ({
         <DialogContent className="max-h-[90vh] max-w-4xl p-2">
           <div className="flex items-center justify-center">
             <img
+              key={`preview-${previewImageUrl}`}
               src={previewImageUrl}
               alt="Blackboard Drawing Preview"
               className="max-h-[80vh] max-w-full rounded-lg object-contain"
