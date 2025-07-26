@@ -146,6 +146,9 @@ export default function AssessmentDetails() {
                 <div className="bg-muted/50 rounded-lg p-4">
                   <h4 className="mb-2 font-medium">Passage:</h4>
                   <p className="text-sm leading-relaxed">{assessment.content.passage}</p>
+                  <br />
+                  <h4 className="mb-2 font-medium">Answer Keys:</h4>
+                  <p className="text-sm leading-relaxed">{assessment.content.expected_answers?.join(', ')}</p>
                 </div>
               </CardContent>
             </Card>
