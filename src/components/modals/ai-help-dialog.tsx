@@ -62,7 +62,7 @@ const AIHelpDialog = ({
               <textarea
                 value={aiHelpPrompt}
                 onChange={e => setAiHelpPrompt(e.target.value)}
-                placeholder="e.g., A student is confused about how to explain the concept of photosynthesis to a 3rd grader. How can I make it simpler?"
+                placeholder="Type any student question or doubt here..."
                 rows={5}
                 className="border-border focus:border-secondary text-foreground w-full resize-none rounded-2xl border-2 p-4 transition-colors duration-200 focus:ring-0 focus:outline-none"
                 disabled={isGenerating}

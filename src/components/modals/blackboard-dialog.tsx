@@ -177,7 +177,7 @@ const BlackboardDialog = ({
                   onChange={e => {
                     setCurrentMessage(e.target.value)
                   }}
-                  placeholder="Add any additional details/requirements to the drawing..."
+                  placeholder="Add any additional details/requirements for the drawing..."
                   rows={3}
                   className="border-border focus:border-secondary text-foreground w-full resize-none rounded-2xl border-2 p-4 pr-4 transition-colors duration-200 focus:ring-0 focus:outline-none"
                   disabled={isGenerating}
