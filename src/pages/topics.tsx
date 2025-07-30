@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTitle } from '../hooks/use-title'
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate } from 'react-router'
 import BottomNav from '../components/bottom-nav'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
@@ -24,10 +24,8 @@ import { useQueryClient } from '@tanstack/react-query'
 export default function Topics() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const params = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const topicIdParam = searchParams.get('topicId')
-  const classroomId = params.classroomId
   const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
   const [selectedTopicId, setSelectedTopicId] = React.useState<number | null>(
     topicIdParam ? parseInt(topicIdParam) : null,
@@ -200,7 +198,7 @@ export default function Topics() {
     <div className="bg-background min-h-screen pb-20">
       <Header
         title={selectedTopic?.name || 'Sahayak'}
-        onBack={() => navigate(`/classrooms?classroomId=${classroomId}`)}
+        onBack={() => navigate('/')}
         showAIHelp={!!selectedTopicId}
         onShowAIHelp={() => setShowAIHelpDialog(true)}
       />
@@ -508,7 +506,7 @@ export default function Topics() {
           )}
         </div>
       </div>
-      <CreateTopicDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} classroomId={classroomId} />
+      <CreateTopicDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
       <AIHelpDialog
         showAIHelpDialog={showAIHelpDialog}
         setShowAIHelpDialog={setShowAIHelpDialog}

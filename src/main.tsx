@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import Home from './pages/home'
-import Classrooms from './pages/classrooms'
+// import { AppContextProvider } from './context/app-context'
+import GradeSelection from './pages/grade-selection'
 import Topics from './pages/topics'
 import WeeklyPlan from './pages/weekly-plan'
 import DayLesson from './pages/day-lesson'
@@ -22,55 +22,51 @@ import StudentDetails from './pages/student-details'
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Home />,
+    element: <GradeSelection />,
     errorElement: <NotFound />,
   },
   {
-    path: '/classrooms',
-    element: <Classrooms />,
-  },
-  {
-    path: '/classrooms/:classroomId/topics',
+    path: '/topics',
     element: <Topics />,
   },
   {
-    path: '/classrooms/:classroomId/weekly-plan',
+    path: '/weekly-plan',
     element: <WeeklyPlan />,
   },
   {
-    path: '/classrooms/:classroomId/day/:day',
+    path: '/day/:day',
     element: <DayLesson />,
   },
   {
-    path: '/classrooms/:classroomId/students',
+    path: '/students',
     element: <StudentManagement />,
   },
   {
-    path: '/classrooms/:classroomId/grade/:grade/students/:id',
+    path: '/grade/:grade/students/:id',
     element: <StudentDetails />,
   },
   {
-    path: '/classrooms/:classroomId/assessments',
+    path: '/assessments',
     element: <Assessments />,
   },
   {
-    path: '/classrooms/:classroomId/grade/:grade/assessment/:assessmentId',
+    path: '/grade/:grade/assessment/:assessmentId',
     element: <AssessmentDetails />,
   },
   {
-    path: '/classrooms/:classroomId/grade/:grade/assessment/:assessmentId/conduct',
+    path: '/grade/:grade/assessment/:assessmentId/conduct',
     element: <AssessmentDetails />,
   },
   {
-    path: '/classrooms/:classroomId/grade/:grade/assessment/:assessmentId/student/:studentId',
+    path: '/grade/:grade/assessment/:assessmentId/student/:studentId',
     element: <StudentAssessment />,
   },
   {
-    path: '/classrooms/:classroomId/day/:day/materials',
+    path: '/day/:day/materials',
     element: <WholeClassMaterials />,
   },
   {
-    path: '/classrooms/:classroomId/day/:day/grade/:gradeId/activities',
+    path: '/day/:day/grade/:gradeId/activities',
     element: <GradeActivities />,
   },
 ])

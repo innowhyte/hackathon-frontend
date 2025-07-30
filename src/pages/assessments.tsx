@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams, useParams } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import { useTitle } from '../hooks/use-title'
 import { useEffect, useState } from 'react'
 import BottomNav from '../components/bottom-nav'
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu'
 import AIHelpDialog from '../components/modals/ai-help-dialog'
+import { useLatestClassroom } from '../queries/classroom-queries'
 import { useAllTopics } from '../queries/topic-queries'
 import { useAssessmentsByTopicGrade } from '../queries/assessment-queries'
 import { useGenerateAssessment, useDeleteAssessment } from '../mutations/assessment-mutations'
@@ -20,14 +21,11 @@ import AssessmentTypeSelector from '../components/assessment-type-selector'
 import { assessmentTypeConfig } from '@/lib/assessment-config'
 import EmptyWeeklyPlan from '@/components/empty-weekly-plan'
 import { toast } from 'sonner'
-import { useClassroomById } from '@/queries/classroom-queries'
 
 export default function TopicAssessment() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const params = useParams()
   const topicIdParam = searchParams.get('topicId')
   const topicId = topicIdParam ? parseInt(topicIdParam) : null
-  const classroomId = params.classroomId
   const [selectedGradeForAssessment, setSelectedGradeForAssessment] = useState<number | null>(null)
   const [selectedAssessmentType, setSelectedAssessmentType] = useState<string | null>(null)
   const [assessmentOptions] = useState({
@@ -39,7 +37,7 @@ export default function TopicAssessment() {
   const [threadId, setThreadId] = useState<string | null>(null)
 
   const navigate = useNavigate()
-  const { data: latestClassroom, isLoading: isLoadingClassroom } = useClassroomById(classroomId)
+  const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
   const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
   const { data: apiAssessments } = useAssessmentsByTopicGrade(
     topicId?.toString() || '',
@@ -96,18 +94,10 @@ export default function TopicAssessment() {
       <Header
         title="Topic Assessment"
         onBack={() => {
-          if (classroomId) {
-            if (topicId) {
-              navigate(`/classrooms/${classroomId}/weekly-plan?topicId=${topicId}`)
-            } else {
-              navigate(`/classrooms/${classroomId}/weekly-plan`)
-            }
+          if (topicId) {
+            navigate(`/weekly-plan?topicId=${topicId}`)
           } else {
-            if (topicId) {
-              navigate(`/weekly-plan?topicId=${topicId}`)
-            } else {
-              navigate('/weekly-plan')
-            }
+            navigate('/weekly-plan')
           }
         }}
         showAIHelp={!!topicId}
@@ -242,7 +232,7 @@ export default function TopicAssessment() {
                               <DropdownMenuItem
                                 onClick={() =>
                                   navigate(
-                                    `/classrooms/${classroomId}/grade/${assessment.grade_id}/assessment/${assessment.id}/conduct?topicId=${selectedTopic.id}`,
+                                    `/grade/${assessment.grade_id}/assessment/${assessment.id}/conduct?topicId=${selectedTopic.id}`,
                                   )
                                 }
                               >

@@ -46,7 +46,6 @@ export const useCreateOrUpdateClassroom = () => {
     mutationFn: createOrUpdateClassroom,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['latestClassroom'] })
-      queryClient.invalidateQueries({ queryKey: ['allClassrooms'] })
     },
   })
 }

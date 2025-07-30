@@ -10,19 +10,19 @@ import { useAllTopics } from '../queries/topic-queries'
 import EmptyWeeklyPlan from '@/components/empty-weekly-plan'
 import { useSearchParams } from 'react-router'
 import Loading from '@/components/loading'
-import { useClassroomById } from '@/queries/classroom-queries'
+import { useLatestClassroom } from '@/queries/classroom-queries'
 import { useUpdateDayPlanMutation } from '../mutations/topic-mutations'
 import { Edit2, X, Check } from 'lucide-react'
 import React from 'react'
 
 export default function DayLesson() {
-  const { day, classroomId } = useParams()
+  const { day } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const topicIdParam = searchParams.get('topicId')
   const topicId = topicIdParam ? parseInt(topicIdParam) : null
   const navigate = useNavigate()
 
-  const { data: latestClassroom, isLoading: isLoadingClassroom } = useClassroomById(classroomId)
+  const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
   const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
   const selectedTopic = topics?.find(t => t.id === topicId)
 
@@ -42,18 +42,10 @@ export default function DayLesson() {
   const currentDayPlan = lessonPlan[`day_${selectedDay}`]
 
   const handleGradeActivitiesClick = (gradeId: number) => {
-    if (classroomId) {
-      if (topicId) {
-        navigate(`/classrooms/${classroomId}/day/${selectedDay}/grade/${gradeId}/activities?topicId=${topicId}`)
-      } else {
-        navigate(`/classrooms/${classroomId}/day/${selectedDay}/grade/${gradeId}/activities`)
-      }
+    if (topicId) {
+      navigate(`/day/${selectedDay}/grade/${gradeId}/activities?topicId=${topicId}`)
     } else {
-      if (topicId) {
-        navigate(`/day/${selectedDay}/grade/${gradeId}/activities?topicId=${topicId}`)
-      } else {
-        navigate(`/day/${selectedDay}/grade/${gradeId}/activities`)
-      }
+      navigate(`/day/${selectedDay}/grade/${gradeId}/activities`)
     }
   }
 
@@ -97,18 +89,10 @@ export default function DayLesson() {
       <Header
         title={`Day ${selectedDay} Lesson Plan`}
         onBack={() => {
-          if (classroomId) {
-            if (topicId) {
-              navigate(`/classrooms/${classroomId}/weekly-plan?topicId=${topicId}`)
-            } else {
-              navigate(`/classrooms/${classroomId}/weekly-plan`)
-            }
+          if (topicId) {
+            navigate(`/weekly-plan?topicId=${topicId}`)
           } else {
-            if (topicId) {
-              navigate(`/weekly-plan?topicId=${topicId}`)
-            } else {
-              navigate('/weekly-plan')
-            }
+            navigate('/weekly-plan')
           }
         }}
       />
@@ -199,18 +183,10 @@ export default function DayLesson() {
                 <div className="mt-4">
                   <Button
                     onClick={() => {
-                      if (classroomId) {
-                        if (topicId) {
-                          navigate(`/classrooms/${classroomId}/day/${selectedDay}/materials?topicId=${topicId}`)
-                        } else {
-                          navigate(`/classrooms/${classroomId}/day/${selectedDay}/materials`)
-                        }
+                      if (topicId) {
+                        navigate(`/day/${selectedDay}/materials?topicId=${topicId}`)
                       } else {
-                        if (topicId) {
-                          navigate(`/day/${selectedDay}/materials?topicId=${topicId}`)
-                        } else {
-                          navigate(`/day/${selectedDay}/materials`)
-                        }
+                        navigate(`/day/${selectedDay}/materials`)
                       }
                     }}
                     className="w-full rounded-xl px-4 py-3 font-medium transition-all duration-200"
@@ -313,7 +289,7 @@ export default function DayLesson() {
           )}
         </div>
       </div>
-      <AIHelpDialog showAIHelpDialog={false} setShowAIHelpDialog={() => {}} />
+      <AIHelpDialog />
       <BottomNav />
     </div>
   )

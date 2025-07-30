@@ -15,37 +15,19 @@ export interface Classroom {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-const fetchClassroomById = async (classroomId: string | undefined): Promise<Classroom | null> => {
-  if (!classroomId) {
-    return null
-  }
-  const response = await fetch(`${API_BASE_URL}/api/classrooms/${classroomId}`)
-  if (!response.ok) {
-    throw new Error('Failed to fetch classrooms')
-  }
-  return response.json()
-}
-
-const fetchAllClassrooms = async (): Promise<Classroom[]> => {
+const fetchLatestClassroom = async (): Promise<Classroom | null> => {
   const response = await fetch(`${API_BASE_URL}/api/classrooms`)
   if (!response.ok) {
     throw new Error('Failed to fetch classrooms')
   }
   const data = await response.json()
-  return Array.isArray(data) ? data : []
+  if (!Array.isArray(data) || data.length === 0) return null
+  return data[data.length - 1]
 }
 
-export const useClassroomById = (classroomId: string | undefined) => {
+export const useLatestClassroom = () => {
   return useQuery({
-    queryKey: ['classroomById', classroomId],
-    queryFn: () => fetchClassroomById(classroomId),
-    enabled: !!classroomId,
-  })
-}
-
-export const useAllClassrooms = () => {
-  return useQuery({
-    queryKey: ['allClassrooms'],
-    queryFn: fetchAllClassrooms,
+    queryKey: ['latestClassroom'],
+    queryFn: fetchLatestClassroom,
   })
 }

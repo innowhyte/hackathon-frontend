@@ -9,7 +9,7 @@ import {
   usePostStudentFeedback,
   useDeleteStudentFeedback,
 } from '../mutations/student-mutations'
-import { useClassroomById } from '../queries/classroom-queries'
+import { useLatestClassroom } from '../queries/classroom-queries'
 
 interface Student {
   id: number
@@ -21,7 +21,7 @@ interface Grade {
   name: string
 }
 
-export const useStudentManagement = (initialGradeId?: number, classroomId?: string) => {
+export const useStudentManagement = (initialGradeId?: number) => {
   const navigate = useNavigate()
 
   // Grade selection state
@@ -37,7 +37,7 @@ export const useStudentManagement = (initialGradeId?: number, classroomId?: stri
   const [selectedStudentForFeedback, setSelectedStudentForFeedback] = useState<Student | null>(null)
 
   // API queries and mutations
-  const { data: latestClassroom, isLoading: isLoadingClassroom } = useClassroomById(classroomId)
+  const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
 
   // Initialize selected grade when classroom data is loaded and initial grade ID is provided
   useEffect(() => {

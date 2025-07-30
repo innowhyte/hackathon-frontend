@@ -18,7 +18,7 @@ const assessmentTypeMap = {
 }
 
 export default function AssessmentDetails() {
-  const { assessmentId, grade, classroomId } = useParams()
+  const { assessmentId, grade } = useParams()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
 
@@ -49,7 +49,7 @@ export default function AssessmentDetails() {
       <div className="bg-background min-h-screen pb-20">
         <Header
           title="Assessment Overview"
-          onBack={() => navigate(`/classrooms/${classroomId}/assessments${topicId ? `?topicId=${topicId}` : ''}`)}
+          onBack={() => navigate(`/assessments${topicId ? `?topicId=${topicId}` : ''}`)}
         />
         <div className="p-6">
           <div className="mx-auto max-w-2xl">
@@ -59,11 +59,7 @@ export default function AssessmentDetails() {
                 <CardDescription>Failed to load assessment details. Please try again.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button
-                  onClick={() =>
-                    navigate(`/classrooms/${classroomId}/assessments${topicId ? `?topicId=${topicId}` : ''}`)
-                  }
-                >
+                <Button onClick={() => navigate(`/assessments${topicId ? `?topicId=${topicId}` : ''}`)}>
                   Back to Assessments
                 </Button>
               </CardContent>
@@ -80,7 +76,7 @@ export default function AssessmentDetails() {
       <div className="bg-background min-h-screen pb-20">
         <Header
           title="Assessment Overview"
-          onBack={() => navigate(`/classrooms/${classroomId}/assessments${topicId ? `?topicId=${topicId}` : ''}`)}
+          onBack={() => navigate(`/assessments${topicId ? `?topicId=${topicId}` : ''}`)}
         />
         <div className="p-6">
           <div className="mx-auto max-w-2xl">
@@ -90,11 +86,7 @@ export default function AssessmentDetails() {
                 <CardDescription>The requested assessment could not be found.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button
-                  onClick={() =>
-                    navigate(`/classrooms/${classroomId}/assessments${topicId ? `?topicId=${topicId}` : ''}`)
-                  }
-                >
+                <Button onClick={() => navigate(`/assessments${topicId ? `?topicId=${topicId}` : ''}`)}>
                   Back to Assessments
                 </Button>
               </CardContent>
@@ -107,13 +99,11 @@ export default function AssessmentDetails() {
   }
 
   const handleSelectStudent = (student: { id: number; name: string }) => {
-    navigate(
-      `/classrooms/${classroomId}/grade/${grade}/assessment/${assessmentId}/student/${student.id}?topicId=${topicId}`,
-    )
+    navigate(`/grade/${grade}/assessment/${assessmentId}/student/${student.id}?topicId=${topicId}`)
   }
 
   const handleBackToAssessment = () => {
-    navigate(`/classrooms/${classroomId}/assessments${topicId ? `?topicId=${topicId}` : ''}`)
+    navigate(`/assessments${topicId ? `?topicId=${topicId}` : ''}`)
   }
 
   return (
@@ -158,9 +148,7 @@ export default function AssessmentDetails() {
                   <p className="text-sm leading-relaxed">{assessment.content.passage}</p>
                   <br />
                   <h4 className="mb-2 font-medium">Answer Keys:</h4>
-                  <p className="text-sm leading-relaxed">
-                    {'expected_answers' in assessment.content ? assessment.content.expected_answers?.join(', ') : ''}
-                  </p>
+                  <p className="text-sm leading-relaxed">{assessment.content.expected_answers?.join(', ')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -263,7 +251,7 @@ export default function AssessmentDetails() {
         </div>
       </div>
 
-      <AIHelpDialog showAIHelpDialog={false} setShowAIHelpDialog={() => {}} />
+      <AIHelpDialog />
       <BottomNav />
     </div>
   )
