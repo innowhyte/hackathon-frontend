@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=cognition');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -38,9 +39,9 @@
   --sidebar-accent-foreground: oklch(0.2128 0.0237 126.6951);
   --sidebar-border: oklch(0.9197 0.004 286.3202);
   --sidebar-ring: oklch(0.8467 0.1358 116.7217);
-  --font-sans: Montserrat, sans-serif;
-  --font-serif: Playfair Display, serif;
-  --font-mono: Geist Mono;
+  --font-sans: Poppins, sans-serif;
+  --font-serif: Poppins, serif;
+  --font-mono: Poppins, monospace;
   --radius: 1rem;
   --shadow-2xs: 0px 2px 4px -2px hsl(0 0% 0% / 0.05);
   --shadow-xs: 0px 2px 4px -2px hsl(0 0% 0% / 0.05);

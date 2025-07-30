@@ -1,20 +1,36 @@
-import { NavLink, useSearchParams, useNavigate, useLocation } from 'react-router'
+import { useSearchParams, useNavigate, useLocation, useParams } from 'react-router'
 
 export default function BottomNav() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const params = useParams()
   const topicId = searchParams.get('topicId')
+  const classroomIdFromParams = params.classroomId
+  const classroomIdFromSearch = searchParams.get('classroomId')
+  const classroomId = classroomIdFromParams || classroomIdFromSearch
 
   const handleNavigation = (path: string) => {
-    if (topicId) {
-      navigate(`${path}?topicId=${topicId}`)
+    if (classroomId) {
+      const classroomPath = `/classrooms/${classroomId}${path}`
+      if (topicId) {
+        navigate(`${classroomPath}?topicId=${topicId}`)
+      } else {
+        navigate(classroomPath)
+      }
     } else {
-      navigate(path)
+      if (topicId) {
+        navigate(`${path}?topicId=${topicId}`)
+      } else {
+        navigate(path)
+      }
     }
   }
 
   const isActive = (path: string) => {
+    if (classroomId) {
+      return location.pathname === `/classrooms/${classroomId}${path}`
+    }
     return location.pathname === path
   }
 

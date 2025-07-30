@@ -22,7 +22,7 @@ const assessmentTypeMap = {
 }
 
 export default function StudentAssessment() {
-  const { assessmentId, studentId, grade } = useParams()
+  const { assessmentId, studentId, grade, classroomId } = useParams()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
 
@@ -69,7 +69,11 @@ export default function StudentAssessment() {
       <div className="bg-background min-h-screen pb-20">
         <Header
           title="Student Assessment"
-          onBack={() => navigate(`/grade/${grade}/assessment/${assessmentId}${topicId ? `?topicId=${topicId}` : ''}`)}
+          onBack={() =>
+            navigate(
+              `/classrooms/${classroomId}/grade/${grade}/assessment/${assessmentId}${topicId ? `?topicId=${topicId}` : ''}`,
+            )
+          }
         />
         <div className="p-6">
           <div className="mx-auto max-w-2xl">
@@ -81,7 +85,9 @@ export default function StudentAssessment() {
               <CardContent>
                 <Button
                   onClick={() =>
-                    navigate(`/grade/${grade}/assessment/${assessmentId}${topicId ? `?topicId=${topicId}` : ''}`)
+                    navigate(
+                      `/classrooms/${classroomId}/grade/${grade}/assessment/${assessmentId}${topicId ? `?topicId=${topicId}` : ''}`,
+                    )
                   }
                 >
                   Back to Assessment
@@ -224,7 +230,9 @@ export default function StudentAssessment() {
   }
 
   const handleBackToOverview = () => {
-    navigate(`/grade/${grade}/assessment/${assessmentId}${topicId ? `?topicId=${topicId}` : ''}`)
+    navigate(
+      `/classrooms/${classroomId}/grade/${grade}/assessment/${assessmentId}${topicId ? `?topicId=${topicId}` : ''}`,
+    )
   }
 
   return (

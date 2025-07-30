@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useTitle } from '../hooks/use-title'
 import BottomNav from '../components/bottom-nav'
 import Header from '../components/header'
@@ -16,9 +16,11 @@ import { useState, useEffect } from 'react'
 
 export default function WeeklyPlan() {
   const navigate = useNavigate()
+  const params = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const topicIdParam = searchParams.get('topicId')
   const topicId = topicIdParam ? parseInt(topicIdParam) : null
+  const classroomId = params.classroomId
   const [showAIHelpDialog, setShowAIHelpDialog] = useState(false)
   const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
   const { mutate: createWeeklyPlan, isPending: isCreatingWeeklyPlan } = useCreateWeeklyPlan()
@@ -44,10 +46,18 @@ export default function WeeklyPlan() {
   }
 
   const handleDaySelect = (day: number) => {
-    if (topicId) {
-      navigate(`/day/${day}?topicId=${topicId}`)
+    if (classroomId) {
+      if (topicId) {
+        navigate(`/classrooms/${classroomId}/day/${day}?topicId=${topicId}`)
+      } else {
+        navigate(`/classrooms/${classroomId}/day/${day}`)
+      }
     } else {
-      navigate(`/day/${day}`)
+      if (topicId) {
+        navigate(`/day/${day}?topicId=${topicId}`)
+      } else {
+        navigate(`/day/${day}`)
+      }
     }
   }
 
@@ -67,7 +77,7 @@ export default function WeeklyPlan() {
     <div className="bg-background min-h-screen pb-20">
       <Header
         title="Weekly Lesson Plan"
-        onBack={() => navigate('/topics')}
+        onBack={() => navigate(`/classrooms/${classroomId}/topics`)}
         showAIHelp={!!topicId}
         onShowAIHelp={() => setShowAIHelpDialog(true)}
       />

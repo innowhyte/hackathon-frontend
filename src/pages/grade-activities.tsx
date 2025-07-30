@@ -25,7 +25,7 @@ const modalityOptions = [
 ]
 
 export default function GradeActivities() {
-  const { day, gradeId } = useParams<{ day: string; gradeId: string }>()
+  const { day, gradeId, classroomId } = useParams<{ day: string; gradeId: string; classroomId: string }>()
   const [searchParams] = useSearchParams()
   const topicIdParam = searchParams.get('topicId')
   const topicId = topicIdParam ? parseInt(topicIdParam) : null
@@ -156,10 +156,18 @@ export default function GradeActivities() {
       <Header
         title={`Day ${day} Activities`}
         onBack={() => {
-          if (topicId) {
-            navigate(`/day/${day}?topicId=${topicId}`)
+          if (classroomId) {
+            if (topicId) {
+              navigate(`/classrooms/${classroomId}/day/${day}?topicId=${topicId}`)
+            } else {
+              navigate(`/classrooms/${classroomId}/day/${day}`)
+            }
           } else {
-            navigate(`/day/${day}`)
+            if (topicId) {
+              navigate(`/day/${day}?topicId=${topicId}`)
+            } else {
+              navigate(`/day/${day}`)
+            }
           }
         }}
       />
