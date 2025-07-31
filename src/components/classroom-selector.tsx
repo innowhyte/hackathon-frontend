@@ -23,7 +23,7 @@ export default function ClassroomSelector({ selectedClassroomId, onClassroomChan
           {classrooms && classrooms.length > 0 ? (
             classrooms.map(classroom => (
               <SelectItem key={classroom.id} value={classroom.id.toString()} className="h-10!">
-                {classroom.location} - {classroom.language}
+                {classroom.name}
               </SelectItem>
             ))
           ) : (

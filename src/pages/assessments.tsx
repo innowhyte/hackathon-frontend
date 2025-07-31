@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu'
-import AIHelpDialog from '../components/modals/ai-help-dialog'
+
 import { useAllTopics } from '../queries/topic-queries'
 import { useAssessmentsByTopicGrade } from '../queries/assessment-queries'
 import { useGenerateAssessment, useDeleteAssessment } from '../mutations/assessment-mutations'
@@ -35,12 +35,12 @@ export default function TopicAssessment() {
     passage_reading: { numberOfWords: 100, difficultyLevel: 'medium' as const },
     passage_completion: { projectType: 'poster' as const },
   })
-  const [showAIHelpDialog, setShowAIHelpDialog] = useState(false)
+
   const [threadId, setThreadId] = useState<string | null>(null)
 
   const navigate = useNavigate()
   const { data: latestClassroom, isLoading: isLoadingClassroom } = useClassroomById(classroomId)
-  const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
+  const { data: topics, isLoading: isLoadingTopics } = useAllTopics(classroomId)
   const { data: apiAssessments } = useAssessmentsByTopicGrade(
     topicId?.toString() || '',
     selectedGradeForAssessment?.toString() || '',
@@ -110,8 +110,6 @@ export default function TopicAssessment() {
             }
           }
         }}
-        showAIHelp={!!topicId}
-        onShowAIHelp={() => setShowAIHelpDialog(true)}
       />
 
       <div className="p-4">
@@ -125,6 +123,7 @@ export default function TopicAssessment() {
                 setSearchParams({})
               }
             }}
+            classroomId={classroomId}
           />
           {!selectedTopic && (
             <EmptyWeeklyPlan
@@ -297,12 +296,6 @@ export default function TopicAssessment() {
         </div>
       </div>
 
-      <AIHelpDialog
-        showAIHelpDialog={showAIHelpDialog}
-        setShowAIHelpDialog={setShowAIHelpDialog}
-        topicId={topicId?.toString() || ''}
-        threadId={threadId || ''}
-      />
       <BottomNav />
     </div>
   )

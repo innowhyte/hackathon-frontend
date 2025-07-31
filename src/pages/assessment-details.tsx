@@ -5,7 +5,7 @@ import Header from '../components/header'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
-import AIHelpDialog from '../components/modals/ai-help-dialog'
+
 import { useAssessmentDetails } from '../queries/assessment-queries'
 import { useStudentsByGrade } from '../queries/student-queries'
 import Loading from '../components/loading'
@@ -263,7 +263,6 @@ export default function AssessmentDetails() {
         </div>
       </div>
 
-      <AIHelpDialog showAIHelpDialog={false} setShowAIHelpDialog={() => {}} />
       <BottomNav />
     </div>
   )
