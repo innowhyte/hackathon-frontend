@@ -11,6 +11,7 @@
 ## Technology Stack
 
 ### Frontend
+
 - **React 19.1.0** - Latest React with concurrent features
 - **TypeScript 5.8.3** - Type-safe development
 - **Vite 7.0.6** - Lightning-fast build tool
@@ -18,6 +19,7 @@
 - **TanStack Query 5.83.0** - Powerful data fetching and caching
 
 ### UI/UX
+
 - **Tailwind CSS 4.1.11** - Utility-first CSS framework
 - **shadcn/ui** - Beautiful, accessible components
 - **Radix UI** - Unstyled, accessible UI primitives
@@ -25,11 +27,13 @@
 - **Sonner** - Toast notifications
 
 ### AI Integration
+
 - **Microsoft Fetch Event Source** - Real-time AI streaming
 - **Marked + React Markdown** - Rich content rendering
 - **KaTeX** - Mathematical expression rendering
 
 ### Development Tools
+
 - **ESLint** - Code linting
 - **Prettier** - Code formatting
 - **pnpm** - Fast, disk space efficient package manager
@@ -39,33 +43,39 @@
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - pnpm (recommended) or npm
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/innowhyte/hackathon-frontend.git
    cd hackathon-frontend
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env
    ```
-   
+
    Configure your `.env` file:
+
    ```env
    VITE_API_BASE_URL=http://localhost:8000
    ```
 
 4. **Start the development server**
+
    ```bash
    pnpm dev
    ```
@@ -126,6 +136,7 @@ src/
 - **Component Structure**: Organized imports and clear separation of concerns
 
 ### Best Practices
+
 - **React Query**: Efficient data fetching and caching
 - **Custom Hooks**: Reusable logic encapsulation
 - **Error Boundaries**: Graceful error handling
@@ -140,6 +151,3 @@ src/
 5. Select or create a new project.
 6. Deploy to production.
 7. You should be able to see the app at the public url provided by Firebase.
-
-
-

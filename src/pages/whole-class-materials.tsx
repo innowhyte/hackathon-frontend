@@ -10,13 +10,13 @@ import StoryDialog from '../components/modals/story-dialog'
 import FlashcardDialog from '../components/modals/flashcard-dialog'
 import GamifiedDialog from '../components/modals/gamified-dialog'
 import QuestionPromptsDialog from '../components/modals/question-prompts-dialog'
-import { useLatestClassroom } from '@/queries/classroom-queries'
+import { useClassroomById } from '@/queries/classroom-queries'
 import TopicSelector from '../components/topic-selector'
 import { useAllTopics } from '../queries/topic-queries'
 import Loading from '@/components/loading'
 
 export default function WholeClassMaterials() {
-  const { day } = useParams()
+  const { day, classroomId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const topicIdParam = searchParams.get('topicId')
   const topicId = topicIdParam ? parseInt(topicIdParam) : null
@@ -29,7 +29,7 @@ export default function WholeClassMaterials() {
   const [showQuestionPromptsDialog, setShowQuestionPromptsDialog] = useState(false)
   const [showVideoDialog, setShowVideoDialog] = useState(false)
   const [showAIHelpDialog, setShowAIHelpDialog] = useState(false)
-  const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
+  const { data: latestClassroom, isLoading: isLoadingClassroom } = useClassroomById(classroomId)
   const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
 
   if (isLoadingClassroom) {
@@ -107,10 +107,18 @@ export default function WholeClassMaterials() {
       <Header
         title="Teaching Materials"
         onBack={() => {
-          if (topicId) {
-            navigate(`/day/${day}?topicId=${topicId}`)
+          if (classroomId) {
+            if (topicId) {
+              navigate(`/classrooms/${classroomId}/day/${day}?topicId=${topicId}`)
+            } else {
+              navigate(`/classrooms/${classroomId}/day/${day}`)
+            }
           } else {
-            navigate(`/day/${day}`)
+            if (topicId) {
+              navigate(`/day/${day}?topicId=${topicId}`)
+            } else {
+              navigate(`/day/${day}`)
+            }
           }
         }}
         showAIHelp={true}

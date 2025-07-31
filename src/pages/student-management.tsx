@@ -1,6 +1,6 @@
 import { useTitle } from '../hooks/use-title'
 import { useStudentManagement } from '../hooks/use-student-management'
-import { useSearchParams } from 'react-router'
+import { useSearchParams, useParams } from 'react-router'
 
 import BottomNav from '../components/bottom-nav'
 import Header from '../components/header'
@@ -14,8 +14,10 @@ import EmptyGradeState from '../components/empty-grade-state'
 
 export default function StudentManagement() {
   const [searchParams] = useSearchParams()
+  const params = useParams()
   const gradeId = searchParams.get('grade')
   const initialGradeId = gradeId ? Number(gradeId) : undefined
+  const classroomId = params.classroomId
 
   const {
     selectedGrade,
@@ -46,14 +48,14 @@ export default function StudentManagement() {
     setShowFeedbackModal,
     getStudentFeedback,
     navigate,
-  } = useStudentManagement(initialGradeId)
+  } = useStudentManagement(initialGradeId, classroomId)
 
   useTitle(`${selectedGrade?.name ? `${selectedGrade.name} | ` : ''} Student Management`)
 
   if (isLoadingClassroom) {
     return (
       <div className="bg-background min-h-screen pb-20">
-        <Header title="Student Management" onBack={() => navigate('/weekly-plan')} />
+        <Header title="Student Management" onBack={() => navigate(`/classrooms/${classroomId}/weekly-plan`)} />
         <div className="p-6">
           <div className="mx-auto max-w-2xl">
             <div className="py-12 text-center">
@@ -71,7 +73,7 @@ export default function StudentManagement() {
 
   return (
     <div className="bg-background min-h-screen pb-20">
-      <Header title="Student Management" onBack={() => navigate('/weekly-plan')} />
+      <Header title="Student Management" onBack={() => navigate(`/classrooms/${classroomId}/weekly-plan`)} />
 
       <div className="p-6">
         <div className="mx-auto max-w-2xl">
@@ -106,7 +108,7 @@ export default function StudentManagement() {
       </div>
 
       {/* Modals */}
-      <AIHelpDialog />
+      <AIHelpDialog showAIHelpDialog={false} setShowAIHelpDialog={() => {}} />
       <AddStudentDialog open={showAddStudentModal} onOpenChange={setShowAddStudentModal} onAdd={handleAddStudent} />
       <EditStudentDialog
         open={showEditStudentModal}

@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea'
-import { useLatestClassroom } from '@/queries/classroom-queries'
+import { useClassroomById } from '@/queries/classroom-queries'
 import { useCreateTopic } from '@/mutations/topic-mutations'
 import { toast } from 'sonner'
 import { PlusIcon } from 'lucide-react'
@@ -11,10 +11,11 @@ import { PlusIcon } from 'lucide-react'
 interface CreateTopicDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  classroomId: string | undefined
 }
 
-const CreateTopicDialog = ({ open, onOpenChange }: CreateTopicDialogProps) => {
-  const { data: latestClassroom, isLoading: isLoadingClassroom } = useLatestClassroom()
+const CreateTopicDialog = ({ open, onOpenChange, classroomId }: CreateTopicDialogProps) => {
+  const { data: latestClassroom, isLoading: isLoadingClassroom } = useClassroomById(classroomId)
   const { mutate: createTopic, isPending: isCreatingTopic } = useCreateTopic()
   const [topic, setTopic] = useState('')
   const [learningOutcomes, setLearningOutcomes] = useState<Record<string, string>>({})
@@ -50,7 +51,7 @@ const CreateTopicDialog = ({ open, onOpenChange }: CreateTopicDialogProps) => {
             setTopicCreatedId(null)
           }, 1000)
         },
-        onError: error => {
+        onError: () => {
           toast.error('Failed to create topic.')
         },
       },

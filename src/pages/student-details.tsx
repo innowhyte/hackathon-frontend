@@ -228,7 +228,7 @@ function ActionableRecommendationsCollapsible({ actionableRecommendations }: { a
 }
 
 export default function StudentDetails() {
-  const { grade, id } = useParams()
+  const { grade, id, classroomId } = useParams()
   const studentId = id ? Number(id) : null
   const navigate = useNavigate()
 
@@ -244,7 +244,7 @@ export default function StudentDetails() {
   if (isLoading || isStudentLoading) {
     return (
       <div className="bg-background min-h-screen pb-20">
-        <Header title="Student Details" onBack={() => navigate(`/students?grade=${grade}`)} />
+        <Header title="Student Details" onBack={() => navigate(`/classrooms/${classroomId}/students?grade=${grade}`)} />
         <div className="flex flex-1 flex-col items-center justify-center px-4 py-8">
           <div className="bg-card w-full max-w-md rounded-xl p-8 text-center shadow-lg">
             <RefreshCw className="text-primary mx-auto mb-4 animate-spin" size={32} />
@@ -259,7 +259,7 @@ export default function StudentDetails() {
   if (error) {
     return (
       <div className="bg-background min-h-screen pb-20">
-        <Header title="Student Details" onBack={() => navigate(`/students?grade=${grade}`)} />
+        <Header title="Student Details" onBack={() => navigate(`/classrooms/${classroomId}/students?grade=${grade}`)} />
         <div className="flex flex-1 flex-col items-center justify-center px-4 py-8">
           <div className="bg-card border-destructive/20 w-full max-w-md rounded-xl border p-8 text-center shadow-lg">
             <div className="bg-destructive/10 mx-auto mb-4 w-fit rounded-full p-3">
@@ -281,7 +281,7 @@ export default function StudentDetails() {
 
   return (
     <div className="bg-background min-h-screen pb-20">
-      <Header title="Student Profile" onBack={() => navigate(`/students?grade=${grade}`)} />
+      <Header title="Student Profile" onBack={() => navigate(`/classrooms/${classroomId}/students?grade=${grade}`)} />
 
       <div className="mx-auto max-w-4xl px-4 py-6">
         {/* Header Section with Gradient using project colors */}
