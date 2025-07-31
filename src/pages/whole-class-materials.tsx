@@ -3,7 +3,7 @@ import { useTitle } from '../hooks/use-title'
 import { useState } from 'react'
 import Header from '../components/header'
 import { Button } from '../components/ui/button'
-import AIHelpDialog from '../components/modals/ai-help-dialog'
+
 import BlackboardDialog from '../components/modals/blackboard-dialog'
 import VideoDialog from '../components/modals/video-dialog'
 import StoryDialog from '../components/modals/story-dialog'
@@ -28,9 +28,9 @@ export default function WholeClassMaterials() {
   const [showGamifiedDialog, setShowGamifiedDialog] = useState(false)
   const [showQuestionPromptsDialog, setShowQuestionPromptsDialog] = useState(false)
   const [showVideoDialog, setShowVideoDialog] = useState(false)
-  const [showAIHelpDialog, setShowAIHelpDialog] = useState(false)
+
   const { data: latestClassroom, isLoading: isLoadingClassroom } = useClassroomById(classroomId)
-  const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
+  const { data: topics, isLoading: isLoadingTopics } = useAllTopics(classroomId)
 
   if (isLoadingClassroom) {
     return <Loading message="Loading classroom..." />
@@ -121,8 +121,6 @@ export default function WholeClassMaterials() {
             }
           }
         }}
-        showAIHelp={true}
-        onShowAIHelp={() => setShowAIHelpDialog(true)}
       />
 
       <div className="p-6">
@@ -136,6 +134,7 @@ export default function WholeClassMaterials() {
                 setSearchParams({})
               }
             }}
+            classroomId={classroomId}
           />
 
           {/* Lesson Content */}
@@ -173,7 +172,7 @@ export default function WholeClassMaterials() {
       </div>
 
       {/* Dialogs */}
-      <AIHelpDialog showAIHelpDialog={showAIHelpDialog} setShowAIHelpDialog={setShowAIHelpDialog} />
+
       {topicId && day && (
         <BlackboardDialog
           topic_id={topicId}

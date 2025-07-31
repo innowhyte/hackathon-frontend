@@ -3,7 +3,7 @@ import { useTitle } from '../hooks/use-title'
 import BottomNav from '../components/bottom-nav'
 import Header from '../components/header'
 import { Button } from '../components/ui/button'
-import AIHelpDialog from '../components/modals/ai-help-dialog'
+
 import TopicSelector from '../components/topic-selector'
 import { useAllTopics } from '../queries/topic-queries'
 import EmptyWeeklyPlan from '@/components/empty-weekly-plan'
@@ -21,8 +21,8 @@ export default function WeeklyPlan() {
   const topicIdParam = searchParams.get('topicId')
   const topicId = topicIdParam ? parseInt(topicIdParam) : null
   const classroomId = params.classroomId
-  const [showAIHelpDialog, setShowAIHelpDialog] = useState(false)
-  const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
+
+  const { data: topics, isLoading: isLoadingTopics } = useAllTopics(classroomId)
   const { mutate: createWeeklyPlan, isPending: isCreatingWeeklyPlan } = useCreateWeeklyPlan()
   const [threadId, setThreadId] = useState<string | null>(null)
 
@@ -63,24 +63,22 @@ export default function WeeklyPlan() {
 
   const handleCreateWeeklyPlan = () => {
     if (!topicId) return
-    createWeeklyPlan(topicId, {
-      onSuccess: () => {
-        toast.success('Weekly lesson plan created successfully!')
+    createWeeklyPlan(
+      { topicId, classroomId: classroomId || '' },
+      {
+        onSuccess: () => {
+          toast.success('Weekly lesson plan created successfully!')
+        },
+        onError: () => {
+          toast.error('Failed to create weekly lesson plan.')
+        },
       },
-      onError: () => {
-        toast.error('Failed to create weekly lesson plan.')
-      },
-    })
+    )
   }
 
   return (
     <div className="bg-background min-h-screen pb-20">
-      <Header
-        title="Weekly Lesson Plan"
-        onBack={() => navigate(`/classrooms/${classroomId}/topics`)}
-        showAIHelp={!!topicId}
-        onShowAIHelp={() => setShowAIHelpDialog(true)}
-      />
+      <Header title="Weekly Lesson Plan" onBack={() => navigate(`/classrooms/${classroomId}/topics`)} />
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-2xl">
           <TopicSelector
@@ -92,6 +90,7 @@ export default function WeeklyPlan() {
                 setSearchParams({})
               }
             }}
+            classroomId={classroomId}
           />
 
           {topicId && hasLessonPlan ? (
@@ -159,12 +158,7 @@ export default function WeeklyPlan() {
           )}
         </div>
       </div>
-      <AIHelpDialog
-        showAIHelpDialog={showAIHelpDialog}
-        setShowAIHelpDialog={setShowAIHelpDialog}
-        topicId={topicId ? topicId.toString() : ''}
-        threadId={threadId || ''}
-      />
+
       <BottomNav />
     </div>
   )

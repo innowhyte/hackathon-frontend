@@ -17,7 +17,7 @@ import { Loader2, Trash2, ImageIcon, LinkIcon, ExternalLink, RotateCw } from 'lu
 import { useSearchParams } from 'react-router'
 import { useCreateWeeklyPlan } from '../mutations/topic-mutations'
 import { Sparkles } from 'lucide-react'
-import AIHelpDialog from '../components/modals/ai-help-dialog'
+
 import { useState, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -28,7 +28,7 @@ export default function Topics() {
   const [searchParams, setSearchParams] = useSearchParams()
   const topicIdParam = searchParams.get('topicId')
   const classroomId = params.classroomId
-  const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
+  const { data: topics, isLoading: isLoadingTopics } = useAllTopics(classroomId)
   const [selectedTopicId, setSelectedTopicId] = React.useState<number | null>(
     topicIdParam ? parseInt(topicIdParam) : null,
   )
@@ -136,7 +136,7 @@ export default function Topics() {
   useTitle(selectedTopic?.name || 'Topic Setup')
   const lessonPlan = selectedTopic?.weekly_plan || {}
   const hasLessonPlan = lessonPlan && Object.keys(lessonPlan).length > 0
-  const [showAIHelpDialog, setShowAIHelpDialog] = useState(false)
+
   const [threadId, setThreadId] = useState<string | null>(null)
 
   // Handlers for supporting materials
@@ -201,8 +201,6 @@ export default function Topics() {
       <Header
         title={selectedTopic?.name || 'Sahayak'}
         onBack={() => navigate(`/classrooms?classroomId=${classroomId}`)}
-        showAIHelp={!!selectedTopicId}
-        onShowAIHelp={() => setShowAIHelpDialog(true)}
       />
       <div className="px-4 py-3">
         <div className="mx-auto w-full max-w-md">
@@ -212,7 +210,11 @@ export default function Topics() {
               + Create Topic
             </Button>
           </div>
-          <TopicSelector selectedTopicId={selectedTopicId} onTopicChange={id => setSelectedTopicId(id)} />
+          <TopicSelector
+            selectedTopicId={selectedTopicId}
+            onTopicChange={id => setSelectedTopicId(id)}
+            classroomId={classroomId}
+          />
 
           {/* Create Weekly Plan Button (if no plan exists) */}
           {selectedTopicId && !hasLessonPlan && (
@@ -220,14 +222,17 @@ export default function Topics() {
               <Button
                 onClick={() => {
                   if (!selectedTopicId) return
-                  createWeeklyPlan(selectedTopicId, {
-                    onSuccess: () => {
-                      toast.success('Weekly lesson plan created successfully!')
+                  createWeeklyPlan(
+                    { topicId: selectedTopicId, classroomId: classroomId || '' },
+                    {
+                      onSuccess: () => {
+                        toast.success('Weekly lesson plan created successfully!')
+                      },
+                      onError: () => {
+                        toast.error('Failed to create weekly lesson plan.')
+                      },
                     },
-                    onError: () => {
-                      toast.error('Failed to create weekly lesson plan.')
-                    },
-                  })
+                  )
                 }}
                 size="lg"
                 className="rounded-xl px-6 py-3 text-base font-medium shadow-md transition-all duration-300 hover:shadow-lg"
@@ -509,12 +514,7 @@ export default function Topics() {
         </div>
       </div>
       <CreateTopicDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} classroomId={classroomId} />
-      <AIHelpDialog
-        showAIHelpDialog={showAIHelpDialog}
-        setShowAIHelpDialog={setShowAIHelpDialog}
-        topicId={selectedTopicId ? selectedTopicId.toString() : ''}
-        threadId={threadId || ''}
-      />
+
       <BottomNav />
     </div>
   )

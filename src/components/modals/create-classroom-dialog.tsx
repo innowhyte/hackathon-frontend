@@ -4,7 +4,9 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { useCreateOrUpdateClassroom } from '../../mutations/classroom-mutations'
+import GradeMultiSelector from '../grade-multi-selector'
 import { toast } from 'sonner'
+import { grades } from '@/lib/grades'
 
 interface CreateClassroomDialogProps {
   open: boolean
@@ -12,33 +14,24 @@ interface CreateClassroomDialogProps {
 }
 
 export default function CreateClassroomDialog({ open, onOpenChange }: CreateClassroomDialogProps) {
+  const [name, setName] = useState('')
   const [location, setLocation] = useState('')
   const [language, setLanguage] = useState('')
-  const [selectedGrades, setSelectedGrades] = useState<number[]>([])
+  const [selectedGrades, setSelectedGrades] = useState<{ id: number; name: string }[]>([])
   const [specialInstructions, setSpecialInstructions] = useState<{ [key: number]: string }>({})
-
-  const grades = [
-    { id: 1, name: 'Grade 1' },
-    { id: 2, name: 'Grade 2' },
-    { id: 3, name: 'Grade 3' },
-    { id: 4, name: 'Grade 4' },
-    { id: 5, name: 'Grade 5' },
-  ]
 
   const createClassroomMutation = useCreateOrUpdateClassroom()
 
-  const handleGradeToggle = (gradeId: number) => {
-    setSelectedGrades(prev => {
-      if (prev.includes(gradeId)) {
-        const newSelected = prev.filter(id => id !== gradeId)
-        const newInstructions = { ...specialInstructions }
-        delete newInstructions[gradeId]
-        setSpecialInstructions(newInstructions)
-        return newSelected
-      } else {
-        return [...prev, gradeId]
+  const handleGradeChange = (grades: { id: number; name: string }[]) => {
+    setSelectedGrades(grades)
+    // Update special instructions to only include selected grades
+    const newInstructions: { [key: number]: string } = {}
+    grades.forEach(grade => {
+      if (specialInstructions[grade.id]) {
+        newInstructions[grade.id] = specialInstructions[grade.id]
       }
     })
+    setSpecialInstructions(newInstructions)
   }
 
   // const handleSpecialInstructionsChange = (gradeId: number, value: string) => {
@@ -49,17 +42,18 @@ export default function CreateClassroomDialog({ open, onOpenChange }: CreateClas
   // }
 
   const handleSubmit = () => {
-    if (!location.trim() || !language.trim() || selectedGrades.length === 0) {
+    if (!name.trim() || !location.trim() || !language.trim() || selectedGrades.length === 0) {
       toast.error('Please fill in all required fields and select at least one grade')
       return
     }
 
     const payload = {
+      name: name.trim(),
       location: location.trim(),
       language: language.trim(),
-      grades: selectedGrades.map(gradeId => ({
-        name: grades.find(g => g.id === gradeId)?.name || `Grade ${gradeId}`,
-        special_instructions: specialInstructions[gradeId] || '',
+      grades: selectedGrades.map(grade => ({
+        name: grade.name,
+        special_instructions: specialInstructions[grade.id] || '',
       })),
     }
 
@@ -68,6 +62,7 @@ export default function CreateClassroomDialog({ open, onOpenChange }: CreateClas
         toast.success('Classroom created successfully!')
         onOpenChange(false)
         // Reset form
+        setName('')
         setLocation('')
         setLanguage('')
         setSelectedGrades([])
@@ -82,6 +77,7 @@ export default function CreateClassroomDialog({ open, onOpenChange }: CreateClas
   const handleCancel = () => {
     onOpenChange(false)
     // Reset form
+    setName('')
     setLocation('')
     setLanguage('')
     setSelectedGrades([])
@@ -95,6 +91,16 @@ export default function CreateClassroomDialog({ open, onOpenChange }: CreateClas
           <DialogTitle>Create New Classroom</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 overflow-y-auto p-1">
+          <div>
+            <Label htmlFor="name">Classroom Name *</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Enter classroom name"
+              className="mt-1"
+            />
+          </div>
           <div>
             <Label htmlFor="location">Location *</Label>
             <Input
@@ -115,39 +121,7 @@ export default function CreateClassroomDialog({ open, onOpenChange }: CreateClas
               className="mt-1"
             />
           </div>
-          <div>
-            <Label>Select Grades *</Label>
-            <div className="mt-2 space-y-3">
-              {grades.map(grade => (
-                <Button
-                  key={grade.id}
-                  onClick={() => handleGradeToggle(grade.id)}
-                  variant={selectedGrades.includes(grade.id) ? 'default' : 'outline'}
-                  size="lg"
-                  className={`shadow-elevation-1 hover:shadow-elevation-2 h-auto w-full rounded-3xl p-4 text-left transition-all duration-300 ${
-                    selectedGrades.includes(grade.id)
-                      ? 'bg-secondary border-primary border-2 text-black'
-                      : 'border-secondary hover:bg-secondary/50 bg-background border-2 text-black'
-                  }`}
-                >
-                  <div className="relative flex w-full items-center">
-                    <span className="flex-1 text-center">{grade.name}</span>
-                    {selectedGrades.includes(grade.id) && (
-                      <div className="bg-primary absolute right-0 flex h-6 w-6 items-center justify-center rounded-full">
-                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                </Button>
-              ))}
-            </div>
-          </div>
+          <GradeMultiSelector selectedGrades={selectedGrades} grades={grades} onGradeChange={handleGradeChange} />
           {/* {selectedGrades.length > 0 && (
             <div>
               <Label>Special Instructions (Optional)</Label>
@@ -182,7 +156,11 @@ export default function CreateClassroomDialog({ open, onOpenChange }: CreateClas
             <Button
               onClick={handleSubmit}
               disabled={
-                createClassroomMutation.isPending || !location.trim() || !language.trim() || selectedGrades.length === 0
+                createClassroomMutation.isPending ||
+                !name.trim() ||
+                !location.trim() ||
+                !language.trim() ||
+                selectedGrades.length === 0
               }
               className="flex-1"
             >

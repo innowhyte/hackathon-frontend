@@ -3,7 +3,7 @@ import { useTitle } from '../hooks/use-title'
 import { Users } from 'lucide-react'
 import Header from '../components/header'
 import { Button } from '../components/ui/button'
-import AIHelpDialog from '../components/modals/ai-help-dialog'
+
 import BottomNav from '../components/bottom-nav'
 import TopicSelector from '../components/topic-selector'
 import { useAllTopics } from '../queries/topic-queries'
@@ -23,7 +23,7 @@ export default function DayLesson() {
   const navigate = useNavigate()
 
   const { data: latestClassroom, isLoading: isLoadingClassroom } = useClassroomById(classroomId)
-  const { data: topics, isLoading: isLoadingTopics } = useAllTopics()
+  const { data: topics, isLoading: isLoadingTopics } = useAllTopics(classroomId)
   const selectedTopic = topics?.find(t => t.id === topicId)
 
   const { mutate: updateDayPlan, isPending } = useUpdateDayPlanMutation()
@@ -80,6 +80,7 @@ export default function DayLesson() {
         topicId: selectedTopic.id,
         dayNumber: selectedDay,
         dayPlan,
+        classroomId: classroomId || '',
       },
       {
         onSuccess: () => {
@@ -124,6 +125,7 @@ export default function DayLesson() {
                 setSearchParams({})
               }
             }}
+            classroomId={classroomId}
           />
 
           {topicId && currentDayPlan ? (
@@ -313,7 +315,7 @@ export default function DayLesson() {
           )}
         </div>
       </div>
-      <AIHelpDialog showAIHelpDialog={false} setShowAIHelpDialog={() => {}} />
+
       <BottomNav />
     </div>
   )

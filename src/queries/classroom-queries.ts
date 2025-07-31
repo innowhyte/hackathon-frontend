@@ -8,6 +8,7 @@ export interface ClassroomGrade {
 
 export interface Classroom {
   id: number
+  name: string
   location: string
   language: string
   grades: ClassroomGrade[]

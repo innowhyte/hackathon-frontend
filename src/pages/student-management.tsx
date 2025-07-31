@@ -4,7 +4,7 @@ import { useSearchParams, useParams } from 'react-router'
 
 import BottomNav from '../components/bottom-nav'
 import Header from '../components/header'
-import AIHelpDialog from '../components/modals/ai-help-dialog'
+
 import AddStudentDialog from '../components/modals/add-student-dialog'
 import EditStudentDialog from '../components/modals/edit-student-dialog'
 import FeedbackDialog from '../components/modals/feedback-dialog'
@@ -108,7 +108,7 @@ export default function StudentManagement() {
       </div>
 
       {/* Modals */}
-      <AIHelpDialog showAIHelpDialog={false} setShowAIHelpDialog={() => {}} />
+
       <AddStudentDialog open={showAddStudentModal} onOpenChange={setShowAddStudentModal} onAdd={handleAddStudent} />
       <EditStudentDialog
         open={showEditStudentModal}

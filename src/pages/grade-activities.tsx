@@ -3,7 +3,7 @@ import { useTitle } from '../hooks/use-title'
 import { useState, useEffect } from 'react'
 import Header from '../components/header'
 import { Button } from '../components/ui/button'
-import AIHelpDialog from '../components/modals/ai-help-dialog'
+
 import { useGradeActivitiesGeneration } from '../hooks/use-grade-activities'
 import { useActivitiesByDayGradeTopic, type Activity } from '../queries/activities-queries'
 import { useSaveActivities } from '../mutations/activities-mutations'
@@ -49,7 +49,6 @@ export default function GradeActivities() {
   const [carouselIndex, setCarouselIndex] = useState(0)
   const [modalities, setModalities] = useState<string[]>([])
   const [modes_of_interaction, setModesOfInteraction] = useState<string>('')
-  const [showAIHelpDialog, setShowAIHelpDialog] = useState(false)
 
   // Separate effect for cleanup when no data
   useEffect(() => {
@@ -488,11 +487,6 @@ export default function GradeActivities() {
           </div>
         </div>
       </div>
-      <AIHelpDialog
-        showAIHelpDialog={showAIHelpDialog}
-        setShowAIHelpDialog={setShowAIHelpDialog}
-        topicId={topicId?.toString()}
-      />
     </div>
   )
 }

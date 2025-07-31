@@ -39,7 +39,7 @@ const CreateTopicDialog = ({ open, onOpenChange, classroomId }: CreateTopicDialo
       grade_id: grade.id ?? idx + 1,
     }))
     createTopic(
-      { name: topic, learning_outcomes },
+      { data: { name: topic, learning_outcomes }, classroomId: classroomId || '' },
       {
         onSuccess: data => {
           setTopicCreatedId(data.id)

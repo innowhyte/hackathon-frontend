@@ -4,10 +4,11 @@ import { useAllTopics } from '../queries/topic-queries'
 interface TopicSelectorProps {
   selectedTopicId: number | null
   onTopicChange: (topicId: number) => void
+  classroomId: string | undefined
 }
 
-export default function TopicSelector({ selectedTopicId, onTopicChange }: TopicSelectorProps) {
-  const { data: topics, isLoading, error } = useAllTopics()
+export default function TopicSelector({ selectedTopicId, onTopicChange, classroomId }: TopicSelectorProps) {
+  const { data: topics, isLoading, error } = useAllTopics(classroomId)
 
   return (
     <div className="mb-4">

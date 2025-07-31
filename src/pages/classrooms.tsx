@@ -10,7 +10,10 @@ import Header from '../components/header'
 import BottomNav from '../components/bottom-nav'
 import ClassroomSelector from '../components/classroom-selector'
 import CreateClassroomDialog from '../components/modals/create-classroom-dialog'
+import EmptyClassroomsState from '../components/empty-classrooms-state'
+import GradeMultiSelector from '../components/grade-multi-selector'
 import { useSearchParams } from 'react-router'
+import { grades } from '@/lib/grades'
 
 export default function Classrooms() {
   useTitle('Classrooms')
@@ -23,23 +26,9 @@ export default function Classrooms() {
   )
   const [showCreateDialog, setShowCreateDialog] = useState(false)
 
-  // Static grades list (from context previously)
-  const grades = [
-    { id: 1, name: 'Grade 1' },
-    { id: 2, name: 'Grade 2' },
-    { id: 3, name: 'Grade 3' },
-    { id: 4, name: 'Grade 4' },
-    { id: 5, name: 'Grade 5' },
-  ]
-
   // Local state for grade selection and config
-  const [selectedGrades, setSelectedGrades] = useState<
-    {
-      gradeId: number
-      specialInstructions: string
-    }[]
-  >([])
-  const [gradeConfig, setGradeConfig] = useState({ location: '', language: '' })
+  const [selectedGrades, setSelectedGrades] = useState<{ id: number; name: string }[]>([])
+  const [gradeConfig, setGradeConfig] = useState({ name: '', location: '', language: '' })
 
   // Fetch latest classroom (keeping for potential future use)
 
@@ -75,6 +64,7 @@ export default function Classrooms() {
   useEffect(() => {
     if (selectedClassroom) {
       setGradeConfig({
+        name: selectedClassroom.name || '',
         location: selectedClassroom.location || '',
         language: selectedClassroom.language || '',
       })
@@ -82,9 +72,9 @@ export default function Classrooms() {
         (selectedClassroom.grades || [])
           .map(g => {
             const gradeObj = grades.find(gr => gr.name === g.name)
-            return gradeObj ? { gradeId: gradeObj.id, specialInstructions: g.special_instructions || '' } : null
+            return gradeObj ? { id: gradeObj.id, name: gradeObj.name } : null
           })
-          .filter(Boolean) as { gradeId: number; specialInstructions: string }[],
+          .filter(Boolean) as { id: number; name: string }[],
       )
     }
   }, [selectedClassroom])
@@ -92,41 +82,28 @@ export default function Classrooms() {
   // Mutation for creating/updating classroom
   const { mutate: createOrUpdateClassroom, isPending, isError, error } = useCreateOrUpdateClassroom()
 
-  // Helper to check if a grade is selected
-  const isGradeSelected = (gradeId: number) => selectedGrades.some(g => g.gradeId === gradeId)
-
-  // Select or deselect a grade
-  const handleGradeSelect = (gradeId: number) => {
-    setSelectedGrades(prev => {
-      if (prev.some(g => g.gradeId === gradeId)) {
-        return prev.filter(g => g.gradeId !== gradeId)
-      } else {
-        return [...prev, { gradeId, specialInstructions: '' }]
-      }
-    })
+  // Handle grade selection change
+  const handleGradeChange = (grades: { id: number; name: string }[]) => {
+    setSelectedGrades(grades)
   }
-
-  // Handle input changes for a selected grade
-  // const handleInputChange = (gradeId: number, field: 'specialInstructions', value: string) => {
-  //   setSelectedGrades(prev => prev.map(g => (g.gradeId === gradeId ? { ...g, [field]: value } : g)))
-  // }
-
   // Handle config input changes
-  const handleConfigChange = (field: 'location' | 'language', value: string) => {
+  const handleConfigChange = (field: 'name' | 'location' | 'language', value: string) => {
     setGradeConfig(prev => ({ ...prev, [field]: value }))
   }
 
   // Validation: at least one grade, and config fields must be filled
-  const allValid = selectedGrades.length > 0 && gradeConfig.location.trim() && gradeConfig.language.trim()
+  const allValid =
+    selectedGrades.length > 0 && gradeConfig.name.trim() && gradeConfig.location.trim() && gradeConfig.language.trim()
 
   // Prepare payload for API
   const getPayload = () => ({
     ...(selectedClassroom?.id ? { id: selectedClassroom.id } : {}),
+    name: gradeConfig.name,
     location: gradeConfig.location,
     language: gradeConfig.language,
     grades: selectedGrades.map(g => ({
-      name: grades.find(gr => gr.id === g.gradeId)?.name || `Grade ${g.gradeId}`,
-      special_instructions: g.specialInstructions,
+      name: g.name,
+      special_instructions: '',
     })),
   })
 
@@ -163,9 +140,7 @@ export default function Classrooms() {
 
           {isLoadingClassrooms && <div>Loading classrooms...</div>}
           {!isLoadingClassrooms && classrooms && classrooms.length === 0 && (
-            <div className="text-muted-foreground py-8 text-center">
-              No classrooms found. Please create a classroom.
-            </div>
+            <EmptyClassroomsState onCreateClassroom={() => setShowCreateDialog(true)} />
           )}
 
           {/* Selected Classroom Details */}
@@ -177,6 +152,10 @@ export default function Classrooms() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-neutral-600">Name</label>
+                      <p className="text-base text-neutral-800">{selectedClassroom.name}</p>
+                    </div>
                     <div>
                       <label className="text-sm font-medium text-neutral-600">Location</label>
                       <p className="text-base text-neutral-800">{selectedClassroom.location}</p>
@@ -210,6 +189,19 @@ export default function Classrooms() {
                 <CardContent>
                   <div className="space-y-4">
                     <div>
+                      <label className="mb-1.5 block text-sm font-medium text-neutral-600" htmlFor="name">
+                        Classroom Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        id="name"
+                        type="text"
+                        required
+                        className="focus:border-primary focus:ring-primary w-full rounded-lg border border-neutral-200 px-3 py-2 text-neutral-800 focus:ring-2 focus:outline-none"
+                        value={gradeConfig.name}
+                        onChange={e => handleConfigChange('name', e.target.value)}
+                      />
+                    </div>
+                    <div>
                       <label className="mb-1.5 block text-sm font-medium text-neutral-600" htmlFor="location">
                         Location <span className="text-red-500">*</span>
                       </label>
@@ -236,40 +228,12 @@ export default function Classrooms() {
                       />
                     </div>
 
-                    {/* Grade Selection Cards */}
-                    <div>
-                      <label className="mb-2 block text-sm font-medium text-neutral-600">Select Grades</label>
-                      <div className="space-y-3">
-                        {grades.map(grade => (
-                          <Button
-                            key={grade.id}
-                            onClick={() => handleGradeSelect(grade.id)}
-                            variant={isGradeSelected(grade.id) ? 'default' : 'outline'}
-                            size="lg"
-                            className={`shadow-elevation-1 hover:shadow-elevation-2 h-auto w-full rounded-3xl p-4 text-left transition-all duration-300 ${
-                              isGradeSelected(grade.id)
-                                ? 'bg-secondary border-primary border-2 text-black'
-                                : 'border-secondary hover:bg-secondary/50 bg-background border-2 text-black'
-                            }`}
-                          >
-                            <div className="relative flex w-full items-center">
-                              <span className="flex-1 text-center">{grade.name}</span>
-                              {isGradeSelected(grade.id) && (
-                                <div className="bg-primary absolute right-0 flex h-6 w-6 items-center justify-center rounded-full">
-                                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                </div>
-                              )}
-                            </div>
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
+                    {/* Grade Selection */}
+                    <GradeMultiSelector
+                      selectedGrades={selectedGrades}
+                      grades={grades}
+                      onGradeChange={handleGradeChange}
+                    />
 
                     {/* Input fields for each selected grade (special instructions only) in order of selection grade id */}
                     {/* {selectedGrades.length > 0 && (

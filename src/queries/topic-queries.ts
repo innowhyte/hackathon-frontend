@@ -10,8 +10,11 @@ export interface Topic {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-const fetchAllTopics = async (): Promise<Topic[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/topics`)
+const fetchAllTopics = async (classroomId: string | undefined): Promise<Topic[]> => {
+  if (!classroomId) {
+    return []
+  }
+  const response = await fetch(`${API_BASE_URL}/api/classrooms/${classroomId}/topics`)
 
   if (!response.ok) {
     throw new Error('Failed to fetch topics')
@@ -20,9 +23,10 @@ const fetchAllTopics = async (): Promise<Topic[]> => {
   return response.json()
 }
 
-export const useAllTopics = () => {
+export const useAllTopics = (classroomId: string | undefined) => {
   return useQuery({
-    queryKey: ['topics'],
-    queryFn: fetchAllTopics,
+    queryKey: ['topics', classroomId],
+    queryFn: () => fetchAllTopics(classroomId),
+    enabled: !!classroomId,
   })
 }

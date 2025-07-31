@@ -7,6 +7,7 @@ export interface ClassroomGrade {
 
 export interface CreateOrUpdateClassroomRequest {
   id?: number
+  name: string
   location: string
   language: string
   grades: ClassroomGrade[]
@@ -14,6 +15,7 @@ export interface CreateOrUpdateClassroomRequest {
 
 export interface Classroom {
   id: number
+  name: string
   location: string
   language: string
   grades: ClassroomGrade[]

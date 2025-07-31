@@ -30,13 +30,13 @@ export default function Home() {
   // ]
 
   return (
-    <div className="bg-primary flex min-h-screen items-center justify-center">
+    <div className="bg-background flex min-h-screen flex-col items-center justify-between pb-10">
       {/* Hero Section */}
-      <section className="px-4 py-16 text-white">
+      <section className="text-primary px-4 py-16">
         <div className="mx-auto max-w-4xl text-center">
           <div className="mb-4 text-center">
-            <h1 className="mb-2 text-4xl font-medium text-white">Sahayak</h1>
-            <p className="text-lg font-normal text-white">Teaching Assistant</p>
+            <h1 className="mb-2 text-4xl font-medium">Sahayak</h1>
+            <p className="text-lg font-normal">Teaching Assistant</p>
           </div>
           <p className="mb-8 text-lg opacity-90 md:text-xl">
             AI-powered tools to create engaging lessons, manage students, and track progress with ease and efficiency.
@@ -45,13 +45,21 @@ export default function Home() {
             <Button
               onClick={() => navigate('/classrooms')}
               size="lg"
-              className="text-primary bg-white hover:bg-white/90"
+              className="bg-primary hover:bg-primary/90 text-white"
             >
               Get Started
             </Button>
           </div>
         </div>
       </section>
+      <div className="mt-10 flex flex-col items-center justify-center">
+        <h3 className="text-primary">Developed by</h3>
+        <img
+          src="https://lzlzroabhwvvduwyfwvr.supabase.co/storage/v1/object/public/assets/iw_logo.png"
+          alt="Innowhyte Logo"
+          className="h-10 w-auto"
+        />
+      </div>
 
       {/* Features Section
       <section className="px-4 py-16">
