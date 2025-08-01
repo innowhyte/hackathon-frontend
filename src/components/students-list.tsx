@@ -20,6 +20,7 @@ interface StudentsListProps {
   onRemoveStudent: (studentId: number) => void
   isRemoving?: boolean
   isAdding?: boolean
+  classroomId: string
 }
 
 export default function StudentsList({
@@ -35,6 +36,7 @@ export default function StudentsList({
   onRemoveStudent,
   isRemoving = false,
   isAdding = false,
+  classroomId,
 }: StudentsListProps) {
   const getFeedbackCount = (studentId: number) => {
     return feedback[studentId]?.length || 0
@@ -145,6 +147,7 @@ export default function StudentsList({
                 onRemove={onRemoveStudent}
                 isRemoving={isRemoving}
                 gradeId={selectedGrade.id}
+                classroomId={classroomId}
               />
             ))}
           </div>

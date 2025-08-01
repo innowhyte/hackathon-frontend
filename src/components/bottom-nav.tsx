@@ -16,6 +16,8 @@ export default function BottomNav() {
   const classroomIdFromSearch = searchParams.get('classroomId')
   const classroomId = classroomIdFromParams || classroomIdFromSearch
 
+  const [threadId] = useState(() => crypto.randomUUID())
+
   const handleNavigation = (path: string) => {
     if (path === '/') {
       // Special case: Home always navigates to root without classroom context
@@ -121,11 +123,10 @@ export default function BottomNav() {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:bg-muted flex flex-col items-center rounded-2xl px-4 py-2 transition-all duration-300"
+                className="text-muted-foreground hover:bg-muted flex flex-row items-center justify-center rounded-2xl px-4 py-2 transition-all duration-300"
               >
-                <Menu className="mb-1 h-6 w-6" />
-                <span className="text-xs font-medium">Menu</span>
+                <Menu className="h-6 w-6" />
+                <span className="text-base font-medium">Menu</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
@@ -148,10 +149,10 @@ export default function BottomNav() {
           {/* Current Active Page Display */}
           <div className="flex flex-col items-center">
             {currentActiveItem && (
-              <>
-                <div className="mb-1 h-6 w-6">{currentActiveItem.icon}</div>
-                <span className="text-secondary-foreground text-xs font-medium">{currentActiveItem.label}</span>
-              </>
+              <div className="flex flex-row items-center gap-1">
+                <div className="h-6 w-6">{currentActiveItem.icon}</div>
+                <span className="text-secondary-foreground text-base font-medium">{currentActiveItem.label}</span>
+              </div>
             )}
           </div>
 
@@ -160,6 +161,7 @@ export default function BottomNav() {
             onClick={() => setShowAIHelpDialog(true)}
             variant="outline"
             size="icon"
+            disabled={!topicId}
             className="h-12 w-12 rounded-full shadow-md transition-all duration-300 hover:shadow-lg"
             aria-label="Get AI Teaching Help"
           >
@@ -176,7 +178,14 @@ export default function BottomNav() {
       </nav>
 
       {/* AI Help Dialog */}
-      <AIHelpDialog showAIHelpDialog={showAIHelpDialog} setShowAIHelpDialog={setShowAIHelpDialog} />
+      {topicId && threadId && (
+        <AIHelpDialog
+          showAIHelpDialog={showAIHelpDialog}
+          setShowAIHelpDialog={setShowAIHelpDialog}
+          topicId={topicId}
+          threadId={threadId}
+        />
+      )}
     </>
   )
 }

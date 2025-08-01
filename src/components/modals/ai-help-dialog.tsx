@@ -8,13 +8,13 @@ import { MarkdownContent } from '../markdown'
 const AIHelpDialog = ({
   showAIHelpDialog,
   setShowAIHelpDialog,
-  topicId = '3', // TODO: Replace with real topic id prop
-  threadId = '1234', // TODO: Replace with real thread id prop
+  topicId,
+  threadId,
 }: {
   showAIHelpDialog: boolean
   setShowAIHelpDialog: (show: boolean) => void
-  topicId?: string
-  threadId?: string
+  topicId: string
+  threadId: string
 }) => {
   const [aiHelpPrompt, setAiHelpPrompt] = useState('')
   const { isGenerating, progress, answer, error, generateAnswer, reset } = useAIHelpAnswer()

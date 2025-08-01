@@ -5,7 +5,6 @@ import BottomNav from '../components/bottom-nav'
 import Header from '../components/header'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import AIHelpDialog from '../components/modals/ai-help-dialog'
 import { useAssessmentDetails } from '../queries/assessment-queries'
 import { useStudentById } from '../queries/student-queries'
 import Loading from '../components/loading'
@@ -855,7 +854,6 @@ export default function StudentAssessment() {
         </div>
       </div>
 
-      <AIHelpDialog />
       <BottomNav />
     </div>
   )
