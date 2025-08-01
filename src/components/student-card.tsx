@@ -15,6 +15,7 @@ interface StudentCardProps {
   onRemove: (studentId: number) => void
   isRemoving?: boolean
   gradeId: number
+  classroomId: string
 }
 
 export default function StudentCard({
@@ -25,12 +26,13 @@ export default function StudentCard({
   onRemove,
   isRemoving = false,
   gradeId,
+  classroomId,
 }: StudentCardProps) {
   const navigate = useNavigate()
   return (
     <div
       className="hover:bg-muted/50 flex cursor-pointer items-center justify-between p-4 transition-colors"
-      onClick={() => navigate(`/grade/${gradeId}/students/${student.id}`)}
+      onClick={() => navigate(`/classrooms/${classroomId}/grade/${gradeId}/students/${student.id}`)}
     >
       <div className="flex items-center space-x-3">
         <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-lg text-sm font-medium">

@@ -87,20 +87,27 @@ export default function StudentManagement() {
 
           {/* Students Section */}
           {selectedGrade ? (
-            <StudentsList
-              students={students}
-              feedback={feedback}
-              selectedGrade={selectedGrade}
-              isLoading={isLoading}
-              isFeedbackLoading={isFeedbackLoading}
-              error={error}
-              onAddStudent={() => setShowAddStudentModal(true)}
-              onOpenFeedback={handleOpenFeedbackModal}
-              onOpenEdit={handleOpenEditModal}
-              onRemoveStudent={handleRemoveStudent}
-              isRemoving={deleteStudentMutation.isPending}
-              isAdding={createStudentMutation.isPending}
-            />
+            classroomId ? (
+              <StudentsList
+                students={students}
+                feedback={feedback}
+                selectedGrade={selectedGrade}
+                isLoading={isLoading}
+                isFeedbackLoading={isFeedbackLoading}
+                error={error}
+                onAddStudent={() => setShowAddStudentModal(true)}
+                onOpenFeedback={handleOpenFeedbackModal}
+                onOpenEdit={handleOpenEditModal}
+                onRemoveStudent={handleRemoveStudent}
+                isRemoving={deleteStudentMutation.isPending}
+                isAdding={createStudentMutation.isPending}
+                classroomId={classroomId}
+              />
+            ) : (
+              <div className="p-8 text-center">
+                <p className="text-muted-foreground">Classroom ID not found</p>
+              </div>
+            )
           ) : (
             <EmptyGradeState />
           )}
@@ -108,7 +115,6 @@ export default function StudentManagement() {
       </div>
 
       {/* Modals */}
-
       <AddStudentDialog open={showAddStudentModal} onOpenChange={setShowAddStudentModal} onAdd={handleAddStudent} />
       <EditStudentDialog
         open={showEditStudentModal}
